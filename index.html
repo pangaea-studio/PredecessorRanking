@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>PRED RANK</title>
+<title>AXIOM — Predecessor Competitive Intelligence</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
 <style>
 /* ============================== DESIGN TOKENS ==============================
@@ -1641,7 +1641,7 @@ const Admin = {
   },
   setFeatured(id, role){ Auth.requireAdmin(); const before = Store.config.featured; Store.config.featured = id && validHeroRole(id, role) ? {id, role} : null; this.audit('settings.featured', 'home', before, Store.config.featured); this.commitConfig(); },
   addPatch(v){ Auth.requireAdmin(); v = cleanPatch(v); if (!v || Store.patches().includes(v)){ toast('Enter a new patch name, for example 1.18.'); return false; } Store.config.customPatches.unshift(v); this.audit('patch.add', v, null, v); this.commitConfig(); return true; },
-  setLiveApi(v){ Auth.requireAdmin(); const url = v ? cleanUrl(v) : null; if (v && !url){ toast('Enter a full https address, for example https://pred-rank-live.example.workers.dev'); return false; }
+  setLiveApi(v){ Auth.requireAdmin(); const url = v ? cleanUrl(v) : null; if (v && !url){ toast('Enter a full https address, for example https://axiom-live.example.workers.dev'); return false; }
     const before = Store.config.liveApi; Store.config.liveApi = url; this.audit('settings.liveApi', 'live backend', before, url); this.commitConfig(); LiveAdapter.refresh(true); return true; },
   setCurrentPatch(v){ Auth.requireAdmin(); if (!Store.patches().includes(v)) return; const before = Store.config.currentPatch; Store.config.currentPatch = v; this.audit('patch.current', 'default patch', before, v); this.commitConfig(); },
   /* Placeholder numbers so the product can be seen filled. Marked DEMO everywhere, removable in one step. */
@@ -1662,7 +1662,7 @@ const Admin = {
   exportConfig(){ return btoa(unescape(encodeURIComponent(JSON.stringify({predrank: STATE_VERSION, config: Store.config, evals: Store.evals})))); },
   importConfig(code){
     Auth.requireAdmin(); let d; try { d = JSON.parse(decodeURIComponent(escape(atob(String(code).trim())))); } catch (e) { d = null; }
-    if (!d || d.predrank !== STATE_VERSION){ toast('This is not a valid PRED/RANK backup code.'); return false; }
+    if (!d || d.predrank !== STATE_VERSION){ toast('This is not a valid AXIOM backup code.'); return false; }
     const before = Object.keys(Store.evals); Store.config = Persist.cleanConfig(d.config); Store.evals = Persist.cleanEvals(d.evals || {});
     [...new Set([...before, ...Object.keys(Store.evals)])].forEach(k => Sync.pushEvals(k));
     this.audit('config.import', 'backup', null, Object.keys(Store.evals).length + ' evaluation sets'); this.commitConfig(); toast('Backup imported.'); return true;
@@ -1680,7 +1680,7 @@ const I18n = {
   D: {
     // navigation and shell
     'Heroes': 'Helden', 'Rankings': 'Rankings', 'Compare': 'Vergleich', 'Methodology': 'Methodik', 'Community': 'Community', 'Admin': 'Admin', 'Account': 'Konto', 'Sign in': 'Anmelden', 'Start': 'Start', 'Menu': 'Menü', 'Close': 'Schließen', 'Main': 'Hauptnavigation',
-    'Search heroes': 'Helden suchen', 'Search ( / )': 'Suche ( / )', 'Search': 'Suche', 'PRED/RANK, start page': 'PRED/RANK, Startseite', 'Skip to content': 'Zum Inhalt springen', 'Language': 'Sprache', 'Deutsch': 'Deutsch', 'English': 'English',
+    'Search heroes': 'Helden suchen', 'Search ( / )': 'Suche ( / )', 'Search': 'Suche', 'AXIOM, start page': 'AXIOM, Startseite', 'Skip to content': 'Zum Inhalt springen', 'Language': 'Sprache', 'Deutsch': 'Deutsch', 'English': 'English',
     'Role scores are our own evaluation. Live statistics come from pred.gg. Community ratings come from users. The three are never mixed.': 'Rollen-Scores sind unsere eigene Bewertung. Live-Statistiken kommen von pred.gg. Community-Wertungen kommen von Nutzern. Die drei werden nie vermischt.',
     'Fan project, not affiliated with Omeda Studios. Predecessor and its hero artwork belong to their owners.': 'Fan-Projekt ohne Verbindung zu Omeda Studios. Predecessor und die Helden-Artworks gehören ihren Rechteinhabern.',
     'Shared data: connected.': 'Gemeinsame Daten: verbunden.', 'Shared data: not connected, stored in this browser.': 'Gemeinsame Daten: nicht verbunden, in diesem Browser gespeichert.',
@@ -1703,7 +1703,7 @@ const I18n = {
     "Why this role values these things": "Warum diese Rolle das so gewichtet",
     "Compare role weights →": "Rollen-Gewichte vergleichen →",
     "View full ranking →": "Ganzes Ranking ansehen →",
-    "Role score history": "Verlauf Rollen-Score",
+    "AXR history": "AXR-Verlauf",
     "Full history →": "Ganzer Verlauf →",
     "No published evaluation yet.": "Noch keine veröffentlichte Bewertung.",
     "Category breakdown": "Kategorie-Aufschlüsselung",
@@ -1767,8 +1767,8 @@ const I18n = {
     "No sign-in provider is available here. Opened as a plain file, this page cannot verify who you are, so everyone is a guest.": "Hier gibt es keinen Anmelde-Anbieter. Als einfache Datei geöffnet kann die Seite nicht prüfen, wer du bist – deshalb ist jeder Gast.",
     "Developer options": "Entwickler-Optionen",
     "Lets you try the admin tools on this device. It protects nothing, nobody else sees its data, and it does not exist on the hosted page.": "Damit kannst du die Admin-Werkzeuge auf diesem Gerät ausprobieren. Es schützt nichts, niemand sonst sieht die Daten, und auf der gehosteten Seite gibt es das nicht.",
-    "You are signed in with the account you use on this platform. There is no separate password for PRED/RANK.": "Du bist mit dem Konto angemeldet, das du auf dieser Plattform nutzt. Für PRED/RANK gibt es kein eigenes Passwort.",
-    "Sign in to your account on this platform and reload the page. PRED/RANK has no separate password.": "Melde dich bei deinem Konto auf dieser Plattform an und lade die Seite neu. PRED/RANK hat kein eigenes Passwort.",
+    "You are signed in with the account you use on this platform. There is no separate password for AXIOM.": "Du bist mit dem Konto angemeldet, das du auf dieser Plattform nutzt. Für AXIOM gibt es kein eigenes Passwort.",
+    "Sign in to your account on this platform and reload the page. AXIOM has no separate password.": "Melde dich bei deinem Konto auf dieser Plattform an und lade die Seite neu. AXIOM hat kein eigenes Passwort.",
     "Invalid role": "Ungültige Rolle",
     "None": "Keine",
     "Evaluation progress": "Bewertungsfortschritt",
@@ -2061,9 +2061,9 @@ const I18n = {
     'The server refused this change: your access level does not allow it.': 'Der Server hat diese Änderung abgelehnt: Deine Zugriffsstufe erlaubt sie nicht.', 'Saving failed. The change will be retried with your next edit.': 'Speichern fehlgeschlagen. Die Änderung wird mit deiner nächsten Bearbeitung erneut versucht.',
     'Rating removed.': 'Wertung entfernt.', 'Thresholds must fall from top to bottom and end at 0.': 'Die Grenzen müssen von oben nach unten fallen und bei 0 enden.', 'Tier thresholds saved.': 'Tier-Grenzen gespeichert.',
     'This hero, role and patch combination is not valid.': 'Diese Kombination aus Held, Rolle und Patch ist nicht gültig.', 'Nothing to copy: already evaluated.': 'Nichts zu kopieren: bereits bewertet.', 'Enter a new patch name, for example 1.18.': 'Gib einen neuen Patch-Namen ein, zum Beispiel 1.18.',
-    'Ratings removed.': 'Wertungen entfernt.', 'This is not a valid PRED/RANK backup code.': 'Das ist kein gültiger PRED/RANK-Sicherungscode.', 'Backup imported.': 'Sicherung importiert.', 'Patch added.': 'Patch hinzugefügt.',
+    'Ratings removed.': 'Wertungen entfernt.', 'This is not a valid AXIOM backup code.': 'Das ist kein gültiger AXIOM-Sicherungscode.', 'Backup imported.': 'Sicherung importiert.', 'Patch added.': 'Patch hinzugefügt.',
     // redesign 10/12
-    'PRED RANK, start page': 'PRED RANK, Startseite', 'The meta': 'Die Meta', 'at a glance': 'auf einen Blick', 'Role scores, tiers and live statistics for every hero – sorted by role and patch.': 'Rollen-Scores, Tiers und Live-Statistiken für jeden Helden – nach Rolle und Patch sortiert.', 'View rankings': 'Zu den Rankings', 'The best in every role': 'Die Besten jeder Rolle', 'All rankings →': 'Alle Rankings →', 'Full ranking →': 'Ganzes Ranking →', 'Not evaluated yet – showing the most played heroes.': 'Noch nicht bewertet – hier die meistgespielten Helden.', 'Hero rankings for Predecessor, by role and patch.': 'Helden-Rankings für Predecessor, nach Rolle und Patch.', 'Role scores': 'Rollen-Scores', 'Own evaluation': 'Eigene Bewertung', 'Statistics': 'Statistiken', 'Game data': 'Spieldaten', 'Fan project. Not affiliated with or endorsed by Omeda Studios. Predecessor and all hero artwork are the property of their respective owners.': 'Fanprojekt. Nicht mit Omeda Studios verbunden oder von Omeda Studios unterstützt. Predecessor und alle Helden-Artworks gehören ihren jeweiligen Inhabern.', 'Saved in this browser only': 'Nur in diesem Browser gespeichert', 'Choose role': 'Rolle wählen', 'View': 'Ansicht', 'Table': 'Tabelle', 'Matrix': 'Matrix', 'Search hero': 'Held suchen', 'All roles': 'Alle Rollen', 'Details': 'Details', 'Level 1': 'Level 1', 'Level 18': 'Level 18', 'Tiers': 'Tiers', 'Not found': 'Nicht gefunden', 'Patches': 'Patches', 'Live.': 'Live.', 'Background motion on': 'Hintergrund-Bewegung an', 'Background motion off': 'Hintergrund-Bewegung aus',
+    'AXIOM, start page': 'AXIOM, Startseite', 'The meta': 'Die Meta', 'at a glance': 'auf einen Blick', 'Role scores, tiers and live statistics for every hero – sorted by role and patch.': 'Rollen-Scores, Tiers und Live-Statistiken für jeden Helden – nach Rolle und Patch sortiert.', 'View rankings': 'Zu den Rankings', 'The best in every role': 'Die Besten jeder Rolle', 'All rankings →': 'Alle Rankings →', 'Full ranking →': 'Ganzes Ranking →', 'Not evaluated yet – showing the most played heroes.': 'Noch nicht bewertet – hier die meistgespielten Helden.', 'Predecessor Competitive Intelligence · Rankings, meta and hero analytics.': 'Predecessor Competitive Intelligence · Rankings, Meta und Helden-Analysen.', 'AXR': 'AXR', 'Axiom Rating': 'Axiom Rating', 'Statistics': 'Statistiken', 'Game data': 'Spieldaten', 'Fan project. Not affiliated with or endorsed by Omeda Studios. Predecessor and all hero artwork are the property of their respective owners.': 'Fanprojekt. Nicht mit Omeda Studios verbunden oder von Omeda Studios unterstützt. Predecessor und alle Helden-Artworks gehören ihren jeweiligen Inhabern.', 'Saved in this browser only': 'Nur in diesem Browser gespeichert', 'Choose role': 'Rolle wählen', 'View': 'Ansicht', 'Table': 'Tabelle', 'Matrix': 'Matrix', 'Search hero': 'Held suchen', 'All roles': 'Alle Rollen', 'Details': 'Details', 'Level 1': 'Level 1', 'Level 18': 'Level 18', 'Tiers': 'Tiers', 'Not found': 'Nicht gefunden', 'Patches': 'Patches', 'Live.': 'Live.', 'Background motion on': 'Hintergrund-Bewegung an', 'Background motion off': 'Hintergrund-Bewegung aus',
     // home dashboard
     'Hero page': 'Heldenseite', 'Role performance': 'Rollen-Leistung', 'Category profile': 'Kategorie-Profil', 'Win rate by patch': 'Winrate nach Patch', 'Abilities & skill order': 'Fähigkeiten & Skill-Reihenfolge', 'Patch history': 'Patch-Verlauf', 'Recommended skill order from pred.gg': 'Empfohlene Skill-Reihenfolge von pred.gg', 'Win rate per patch, all roles · pred.gg': 'Winrate pro Patch, alle Rollen · pred.gg', 'pred.gg · ranked, all roles combined': 'pred.gg · Ranked, alle Rollen zusammen', 'Not evaluated yet': 'Noch nicht bewertet', 'Passive': 'Passiv', 'No history.': 'Kein Verlauf.', 'No data': 'Keine Daten', 'Ranking': 'Ranking', 'Ban rate': 'Banrate', 'Pick rate': 'Pickrate', 'Matches': 'Spiele', 'Hero': 'Held', 'Score': 'Score', 'Previous hero': 'Vorheriger Held', 'Next hero': 'Nächster Held',
     'Home': 'Start', 'Read more': 'Mehr lesen', 'Show less': 'Weniger', 'Heroes in focus': 'Helden im Fokus'
@@ -2073,7 +2073,7 @@ const I18n = {
     const T = s => this.tr(s);
     return this.R = (this.extraRules ? this.extraRules(T) : []).concat([
       [/^Own evaluation · patch (.+)$/, 'Eigene Bewertung · Patch $1'], [/^of (\d+) rated · (.+)$/, 'von $1 bewerteten · $2'], [/^All roles · patch (.+?) vs (.+)$/, 'Alle Rollen · Patch $1 ggü. $2'], [/^All roles · patch (.+)$/, 'Alle Rollen · Patch $1'],
-      [/^Role score · (.+)$/, 'Rollen-Score · $1'], [/^Ranking context · (.+)$/, 'Ranking-Umfeld · $1'], [/^Average (Offlane|Jungle|Mid|Carry|Support)$/, 'Ø $1'], [/^(Offlane|Jungle|Mid|Carry|Support) · pred\.gg$/, '$1 · pred.gg'],
+      [/^AXR · (.+)$/, 'AXR · $1'], [/^Ranking context · (.+)$/, 'Ranking-Umfeld · $1'], [/^Average (Offlane|Jungle|Mid|Carry|Support)$/, 'Ø $1'], [/^(Offlane|Jungle|Mid|Carry|Support) · pred\.gg$/, '$1 · pred.gg'],
       [/^Only the roles pred\.gg lists for (.+)\. Win rate in the role, patch (.+)\.$/, 'Nur die Rollen, die pred.gg für $1 führt. Winrate in der Rolle, Patch $2.'],
       [/^No ranking yet for (.+) in patch (.+)\.$/, 'Noch kein Ranking für $1 in Patch $2.'], [/^The category profile appears once (.+) is evaluated as (.+)\.$/, 'Das Kategorie-Profil erscheint, sobald $1 als $2 bewertet ist.'],
       [/^Pick (.+) · Ban (.+)$/, 'Pick $1 · Ban $2'], [/^Recommended skill order, level 1 to (\d+)$/, 'Empfohlene Skill-Reihenfolge, Level 1 bis $1'], [/^(.+) win rate by patch, all roles$/, 'Winrate von $1 nach Patch, alle Rollen'],
@@ -2089,7 +2089,7 @@ const I18n = {
       [/^(.+): ([\d.]+) of ([\d.]+) points$/, (m, a, x, y) => T(a) + ': ' + x + ' von ' + y + ' Punkten'],
       [/^(Offlane|Jungle|Mid|Carry|Support) ranking$/, '$1-Ranking'], [/^(Offlane|Jungle|Mid|Carry|Support) weights\.$/, '$1-Gewichte.'],
       [/^Evaluated in one patch so far: ([\d.]+) in patch (.+)\.$/, 'Bisher in einem Patch bewertet: $1 in Patch $2.'],
-      [/^Role score history · (.+)$/, 'Verlauf Rollen-Score · $1'], [/^Role ranking · patch (.+)$/, 'Rollen-Ranking · Patch $1'], [/^Evaluation · (.+)$/, 'Bewertung · $1'],
+      [/^AXR history · (.+)$/, 'AXR-Verlauf · $1'], [/^Role ranking · patch (.+)$/, 'Rollen-Ranking · Patch $1'], [/^Evaluation · (.+)$/, 'Bewertung · $1'],
       [/^More about (.+)$/, 'Mehr zu $1'], [/^Hero gallery · (.+)$/, (m, a) => 'Helden-Galerie · ' + T(a)], [/^First (\d+) of (\d+) in the current order$/, 'Die ersten $1 von $2 in der aktuellen Reihenfolge'],
       [/^#(\d+) · (.+)$/, '#$1 · $2'], [/^(1v1|Lane|Skirmish|Teamfight|Map|Objective|Safety|Utility) (\d+)$/, (m, a, n) => T(a) + ' ' + n],
       [/^Strongest: (.+)$/, (m, a) => 'Stärken: ' + a.split(', ').map(x => { const i = x.lastIndexOf(' '); return T(x.slice(0, i)) + x.slice(i); }).join(', ')],
@@ -2167,7 +2167,7 @@ const I18n = {
       [/^Fills every hero and role of patch (\S+) that has no evaluation with placeholder numbers, marked DEMO on the site\. Use it to see the product filled; remove it before you publish real scores\. Currently (\d+) demo evaluations\.$/, 'Füllt jeden Helden und jede gelistete Rolle von Patch $1 ohne Bewertung mit Platzhalter-Zahlen, die auf der Seite als DEMO markiert sind. So siehst du das Produkt gefüllt; entferne sie, bevor du echte Scores veröffentlichst. Aktuell $2 Demo-Bewertungen.'],
       [/^This browser still holds (\d+) manual tier lists from the earlier version\. They are kept apart and are not part of the ranking\.$/, 'Dieser Browser enthält noch $1 manuelle Tier-Listen aus der früheren Version. Sie werden getrennt aufbewahrt und gehören nicht zum Ranking.'],
       [/^Background motion (on|off)$/, (m, s) => 'Hintergrund-Bewegung ' + (s === 'on' ? 'an' : 'aus')],
-      [/^PRED\/RANK · patch (\S+) · role score ≠ win rate ≠ user rating$/, 'PRED/RANK · Patch $1 · Rollen-Score ≠ Winrate ≠ Nutzerwertung'],
+      [/^PRED\/RANK · patch (\S+) · role score ≠ win rate ≠ user rating$/, 'AXIOM · Patch $1 · Rollen-Score ≠ Winrate ≠ Nutzerwertung'],
       [/^Trend from ([\d.]+) to ([\d.]+)$/, 'Verlauf von $1 bis $2'],
       [/^(.+) · (\d+(?:\.\d+)?)%$/, (m, c, w) => T(c) + ' · ' + w + ' %'],
       [/^([A-Za-z0-9][A-Za-z0-9 \/().-]*): (-?[\d.]+)$/, (m, a, v) => T(a) + ': ' + v],
@@ -2230,10 +2230,10 @@ Object.assign(I18n.D, {
   "explicit (from the source)": "explizit (von der Quelle)",
   "unavailable – only all-role numbers": "nicht verfügbar – nur Zahlen über alle Rollen",
   'Meta': 'Meta', 'Overview': 'Übersicht', 'Patch history': 'Patch-Verlauf', 'Meta snapshot': 'Meta-Überblick', 'Full meta →': 'Ganze Meta →', 'Explore': 'Entdecken',
-  'Every role, ranked by role score': 'Jede Rolle, nach Rollen-Score geordnet', 'Movers, tiers and observed matches': 'Auf- und Absteiger, Tiers und beobachtete Spiele', 'All heroes with roles and numbers': 'Alle Helden mit Rollen und Zahlen', 'How a score is made': 'Wie ein Score entsteht',
-  'Biggest movers · own evaluation': 'Größte Veränderungen · eigene Bewertung', 'Role score against the previous evaluated patch': 'Rollen-Score gegenüber dem vorigen bewerteten Patch',
+  'Every role, ranked by AXR': 'Jede Rolle, nach Rollen-Score geordnet', 'Movers, tiers and observed matches': 'Auf- und Absteiger, Tiers und beobachtete Spiele', 'All heroes with roles and numbers': 'Alle Helden mit Rollen und Zahlen', 'How AXR is calculated': 'Wie ein Score entsteht',
+  'Biggest movers · own evaluation': 'Größte Veränderungen · eigene Bewertung', 'AXR against the previous evaluated patch': 'Rollen-Score gegenüber dem vorigen bewerteten Patch',
   'Risers and fallers appear once a hero is published in two patches.': 'Auf- und Absteiger erscheinen, sobald ein Held in zwei Patches veröffentlicht ist.',
-  'Bar: share of each tier, best on the left · number: average role score': 'Balken: Anteil jedes Tiers, das beste links · Zahl: Ø Rollen-Score',
+  'Bar: share of each tier, best on the left · number: average AXR': 'Balken: Anteil jedes Tiers, das beste links · Zahl: Ø Rollen-Score',
   'No observed statistics for this patch.': 'Keine beobachteten Statistiken für diesen Patch.',
   'Snapshot · pred.gg': 'Schnappschuss · pred.gg', 'Sample': 'Stichprobe', 'matches': 'Spiele', 'match': 'Spiel', 'Snapshot of': 'Schnappschuss vom', 'Updated': 'Aktualisiert', 'updated': 'aktualisiert', 'snapshot of': 'Schnappschuss vom',
   'All roles combined': 'Alle Rollen zusammen', 'This role': 'Diese Rolle', 'Coverage': 'Zeitraum', 'Recent completed matches': 'Kürzlich beendete Spiele', 'Stale': 'Veraltet', 'Patch derived from match time': 'Patch aus der Spielzeit abgeleitet', 'No statistics': 'Keine Statistiken',
@@ -2244,7 +2244,7 @@ Object.assign(I18n.D, {
   'Win rate, pick rate and matches are observed statistics and never part of the score.': 'Winrate, Pickrate und Spiele sind beobachtete Statistiken und nie Teil des Scores.',
   'Score distribution': 'Score-Verteilung', 'Every portrait sits at its exact role score; bands are the current tier ranges.': 'Jedes Porträt steht genau bei seinem Rollen-Score; die Bänder sind die aktuellen Tier-Bereiche.',
   'Every portrait sits at its exact role score. Stacking only avoids overlap. Bands are the current tier ranges.': 'Jedes Porträt steht genau bei seinem Rollen-Score. Das Stapeln verhindert nur Überlappung. Die Bänder sind die aktuellen Tier-Bereiche.',
-  'Own evaluation': 'Eigene Bewertung', 'Role meta': 'Rollen-Meta', 'From published evaluations only. Uses the current weights and tier thresholds.': 'Nur aus veröffentlichten Bewertungen. Mit den aktuellen Gewichten und Tier-Grenzen.',
+  'Axiom Rating': 'Axiom Rating', 'Role meta': 'Rollen-Meta', 'From published evaluations only. Uses the current weights and tier thresholds.': 'Nur aus veröffentlichten Bewertungen. Mit den aktuellen Gewichten und Tier-Grenzen.',
   'Average role score': 'Ø Rollen-Score', 'rated': 'bewertet', 'Spread': 'Streuung', 'Average': 'Durchschnitt', 'Median': 'Median', 'Tier distribution': 'Tier-Verteilung',
   'Biggest score risers': 'Größte Aufsteiger', 'Biggest score fallers': 'Größte Absteiger', 'Tier changes': 'Tier-Wechsel', 'Tier change': 'Tier-Wechsel', 'Tier changes in total': 'Tier-Wechsel insgesamt', 'Patch history →': 'Patch-Verlauf →',
   'No hero rose against its previous evaluated patch.': 'Kein Held ist gegenüber seinem vorigen bewerteten Patch gestiegen.', 'No hero fell against its previous evaluated patch.': 'Kein Held ist gegenüber seinem vorigen bewerteten Patch gefallen.',
@@ -2254,7 +2254,7 @@ Object.assign(I18n.D, {
   'Category': 'Kategorie', 'Strongest': 'Am stärksten', 'Next': 'Danach', 'Most balanced': 'Am ausgeglichensten', 'Most specialised': 'Am spezialisiertesten',
   'Smallest spread between the hero’s own category ratings.': 'Kleinste Streuung zwischen den eigenen Kategoriewertungen des Helden.', 'Largest spread: a few clear strengths, the peak category is named.': 'Größte Streuung: wenige klare Stärken, die stärkste Kategorie steht dabei.',
   'Clusters, gaps and outliers': 'Cluster, Lücken und Ausreißer', 'Cluster': 'Cluster', 'Gap': 'Lücke', 'Outlier': 'Ausreißer', 'None': 'Keine', 'See Methodology for how these are found.': 'Wie diese gefunden werden, steht unter Methodik.',
-  'Observed matches': 'Beobachtete Spiele', 'Recent completed matches collected by the PRED RANK backend.': 'Kürzlich beendete Spiele, gesammelt vom PRED-RANK-Backend.', 'Checking the live backend …': 'Live-Backend wird geprüft …',
+  'Observed matches': 'Beobachtete Spiele', 'Recent completed matches collected by the AXIOM backend.': 'Kürzlich beendete Spiele, gesammelt vom AXIOM-Backend.', 'Checking the live backend …': 'Live-Backend wird geprüft …',
   'No live backend data right now, so the embedded pred.gg snapshot is shown.': 'Gerade keine Daten vom Live-Backend, deshalb wird der eingebettete pred.gg-Schnappschuss gezeigt.',
   'Most played': 'Meistgespielt', 'Win rate distribution': 'Winrate-Verteilung', 'Pick rate distribution': 'Pickrate-Verteilung', 'Too few heroes with enough matches.': 'Zu wenige Helden mit genug Spielen.',
   'Pick rate is not available for this source.': 'Für diese Quelle gibt es keine Pickrate.', 'Share of matches a hero appears in.': 'Anteil der Spiele, in denen ein Held vorkommt.', 'Share of matches with the hero in this role.': 'Anteil der Spiele mit dem Helden in dieser Rolle.',
@@ -2274,10 +2274,10 @@ Object.assign(I18n.D, {
   'Most used first. A high win rate in a small sample is not a recommendation.': 'Meistgenutzte zuerst. Eine hohe Winrate in einer kleinen Stichprobe ist keine Empfehlung.',
   /* methodology */
   'Three kinds of numbers': 'Drei Arten von Zahlen', 'Never mixed.': 'Nie vermischt.', 'Our structured rating per hero, role and patch. Only it decides score, rank and tier.': 'Unsere strukturierte Bewertung pro Held, Rolle und Patch. Nur sie bestimmt Score, Rang und Tier.',
-  'Live · observed matches': 'Live · beobachtete Spiele', 'Win rate, pick rate and matches from recent completed matches, collected by the PRED RANK backend. Without it the embedded pred.gg snapshot is shown, labelled as a snapshot.': 'Winrate, Pickrate und Spiele aus kürzlich beendeten Spielen, gesammelt vom PRED-RANK-Backend. Ohne Backend wird der eingebettete pred.gg-Schnappschuss gezeigt und als Schnappschuss gekennzeichnet.',
+  'Live · observed matches': 'Live · beobachtete Spiele', 'Win rate, pick rate and matches from recent completed matches, collected by the AXIOM backend. Without it the embedded pred.gg snapshot is shown, labelled as a snapshot.': 'Winrate, Pickrate und Spiele aus kürzlich beendeten Spielen, gesammelt vom AXIOM-Backend. Ohne Backend wird der eingebettete pred.gg-Schnappschuss gezeigt und als Schnappschuss gekennzeichnet.',
   'Role score ≠ win rate.': 'Rollen-Score ≠ Winrate.', 'Role score ≠ win rate ≠ user rating.': 'Rollen-Score ≠ Winrate ≠ Nutzerwertung.', 'A high win rate never raises a role score, and a low one never lowers it.': 'Eine hohe Winrate hebt einen Rollen-Score nie an, eine niedrige senkt ihn nie.',
   'Observed data': 'Beobachtete Daten', 'What the statistics mean.': 'Was die Statistiken bedeuten.', 'Source': 'Quelle',
-  'The PRED RANK backend collects completed matches from the source it is connected to and serves them to this page. The page never asks Omeda or pred.gg for matches itself. Live means recent completed matches, not games in progress.': 'Das PRED-RANK-Backend sammelt beendete Spiele aus der angebundenen Quelle und liefert sie an diese Seite. Die Seite fragt Omeda oder pred.gg nie selbst nach Spielen. Live heißt: kürzlich beendete Spiele, keine laufenden.',
+  'The AXIOM backend collects completed matches from the source it is connected to and serves them to this page. The page never asks Omeda or pred.gg for matches itself. Live means recent completed matches, not games in progress.': 'Das AXIOM-Backend sammelt beendete Spiele aus der angebundenen Quelle und liefert sie an diese Seite. Die Seite fragt Omeda oder pred.gg nie selbst nach Spielen. Live heißt: kürzlich beendete Spiele, keine laufenden.',
   'Coverage and sample': 'Zeitraum und Stichprobe', 'Every block names how many matches it is based on and which period they cover.': 'Jeder Block nennt, auf wie vielen Spielen er beruht und welchen Zeitraum sie abdecken.',
   'Matches won ÷ matches played by the hero.': 'Gewonnene Spiele ÷ gespielte Spiele des Helden.',
   'Matches with the hero ÷ all observed matches × 100, counted only in complete matches with ten players. With ten heroes per match all heroes add up to 1000 %. Per role: matches with the hero in that role ÷ matches in which every player has a role; two per match, so one role adds up to 200 %.': 'Spiele mit dem Helden ÷ alle beobachteten Spiele × 100, gezählt nur in vollständigen Spielen mit zehn Spielern. Bei zehn Helden pro Spiel ergeben alle Helden zusammen 1000 %. Pro Rolle: Spiele mit dem Helden in dieser Rolle ÷ Spiele, in denen jeder Spieler eine Rolle hat; zwei pro Spiel, also ergibt eine Rolle 200 %.',
@@ -2308,7 +2308,7 @@ Object.assign(I18n.D, {
   'pred.gg: single matches are public (teams, roles, winner, items, version), bans are not. Finding new matches (match lists, statistics, matchups) answers “Forbidden” without the credentials of a pred.gg API application.': 'pred.gg: Einzelne Spiele sind öffentlich (Teams, Rollen, Sieger, Items, Version), Bans nicht. Neue Spiele finden (Match-Listen, Statistiken, Matchups) antwortet ohne die Zugangsdaten einer pred.gg-API-Anwendung mit „Forbidden“.',
   'So live statistics start once the backend runs with pred.gg API credentials, or once Omeda serves matches again. Until then the snapshot below is used.': 'Live-Statistiken starten also, sobald das Backend mit pred.gg-API-Zugangsdaten läuft oder Omeda wieder Spiele liefert. Bis dahin wird der Schnappschuss unten genutzt.',
   'Embedded snapshot · pred.gg': 'Eingebetteter Schnappschuss · pred.gg', 'Check pred.gg roster': 'pred.gg-Heldenliste prüfen', 'Statistics snapshot': 'Statistik-Schnappschuss', 'Role statistics': 'Rollen-Statistik', 'New on pred.gg': 'Neu auf pred.gg', 'Nothing missing': 'Nichts fehlt', 'Endpoint': 'Endpunkt',
-  'Backend address saved.': 'Backend-Adresse gespeichert.', 'Backend address removed.': 'Backend-Adresse entfernt.', 'Enter a full https address, for example https://pred-rank-live.example.workers.dev': 'Bitte eine vollständige https-Adresse eingeben, z. B. https://pred-rank-live.example.workers.dev',
+  'Backend address saved.': 'Backend-Adresse gespeichert.', 'Backend address removed.': 'Backend-Adresse entfernt.', 'Enter a full https address, for example https://axiom-live.example.workers.dev': 'Bitte eine vollständige https-Adresse eingeben, z. B. https://axiom-live.example.workers.dev',
   'Live data': 'Live-Daten', 'Statistics': 'Statistiken', 'The two sides use different sources or role scopes': 'Die beiden Seiten nutzen unterschiedliche Quellen oder Rollenbezüge'
 });
 I18n.extraRules = T => [
@@ -2602,7 +2602,7 @@ void main(){
 };
 
 /* =============================== LIVE DATA ================================
-   Layer A2 – OBSERVED MATCHES from the PRED RANK backend (a Cloudflare Worker that
+   Layer A2 – OBSERVED MATCHES from the AXIOM backend (a Cloudflare Worker that
    collects recent completed matches into its own database; see backend/README.md).
    "Live" means: recent completed matches, collected a few minutes after they end –
    never an in-progress feed. The page never talks to Omeda or pred.gg match APIs
@@ -2820,7 +2820,7 @@ function wireTip(tip, el, fill){
 const topCats = (c, role, n) => ROLE_CATS[role].filter(k => c[k] != null).sort((a, b) => c[b] - c[a]).slice(0, n);
 const topCatsText = (c, role) => topCats(c, role, 2).map(k => CAT[k].short + ' ' + Math.round(c[k])).join(', ');
 /* What a ranked hero shows on hover / focus: name, role, tier, rank, score, two strongest categories. */
-const rankTip = (r, role) => [h('b', null, HERO[r.id].name), h('span', null, ROLE_LABEL[role]), ' · ', h('span', null, 'Tier ' + r.tier), ' · #' + r.rank, h('br'), h('span', null, 'Role score ' + fmt1(r.score)), h('br'), h('span', null, 'Strongest: ' + topCatsText(r.ev.c, role))];
+const rankTip = (r, role) => [h('b', null, HERO[r.id].name), h('span', null, ROLE_LABEL[role]), ' · ', h('span', null, 'Tier ' + r.tier), ' · #' + r.rank, h('br'), h('span', null, 'AXR ' + fmt1(r.score)), h('br'), h('span', null, 'Strongest: ' + topCatsText(r.ev.c, role))];
 /* The role weights of every role side by side. */
 function weightsTable(mark){
   const w = Store.config.weights;
@@ -2843,7 +2843,7 @@ function baseStats(id){
 
 /* Wordmark: a small eclipse ring and the name in two weights. */
 function brandMark(){
-  return h('span', {class: 'bm'}, S('svg', {class: 'bm-ring', viewBox: '0 0 24 24', 'aria-hidden': 'true'}, S('circle', {cx: 12, cy: 12, r: 8.5}), S('path', {d: 'M16.6 19.1a8.5 8.5 0 0 0 3.6-9.4'})), h('b', null, 'PRED'), h('span', null, 'RANK'));
+  return h('span', {class: 'bm'}, S('svg', {class: 'bm-ring', viewBox: '0 0 24 24', 'aria-hidden': 'true'}, S('circle', {cx: 12, cy: 12, r: 8.5}), S('path', {d: 'M16.6 19.1a8.5 8.5 0 0 0 3.6-9.4'})), h('b', null, 'AXI'), h('span', null, 'OM'));
 }
 
 const Views = {};
@@ -2919,7 +2919,7 @@ Views.home = () => {
   };
   const total = Engine.ranking(patch, role).length, mv = e ? Engine.movement(x.id, role, patch) : null;
   const kpis = h('div', {class: 'dash kpis'},
-    card('kpi score', 'Role score · ' + ROLE_LABEL[role],
+    card('kpi score', 'AXR · ' + ROLE_LABEL[role],
       e ? h('div', {class: 'score-row'}, h('span', {class: 'score-v num'}, fmt1(e.score)), h('span', {class: 'tierb'}, h('b', null, e.tier), h('small', null, 'Tier'))) : h('div', {class: 'score-row'}, h('span', {class: 'score-v dim'}, '—')),
       h('p', {class: 'note'}, e ? 'Own evaluation · patch ' + patch : 'Not evaluated yet')),
     card('kpi', 'Ranking', h('div', {class: 'kpi-row'}, h('span', {class: 'kpi-v num'}, e ? '#' + e.rank : '—'), movementEl(mv)),
@@ -2931,7 +2931,7 @@ Views.home = () => {
     return h('li', {class: 'go' + (r === role ? ' on' : ''), tabindex: '0', role: 'button', 'aria-pressed': String(r === role), onclick: () => setRole(r), onkeydown: ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); setRole(r); } }}, h('span', {class: 'rp-n'}, roleIcon(r), ROLE_LABEL[r]), h('span', {class: 'rp-v num'}, re ? fmt1(re.score) : '—'),
       h('span', {class: 'rp-bar', 'aria-hidden': 'true'}, h('i', {style: {width: (re ? clamp(re.score, 0, 100) : 0) + '%'}})), h('span', {class: 'rp-wr num'}, rl ? fmtPct(rl.winRate) : '—')); });
   const rl = live(x.id, role);
-  const perf = card('perf', 'Role performance', h('ul', {class: 'rp-list'}, h('li', {class: 'rp-head micro'}, h('span', null, 'Role'), h('span', null, 'Score'), h('span'), h('span', null, 'Win rate')), roleRows),
+  const perf = card('perf', 'Role performance', h('ul', {class: 'rp-list'}, h('li', {class: 'rp-head micro'}, h('span', null, 'Role'), h('span', null, 'AXR'), h('span'), h('span', null, 'Win rate')), roleRows),
     rl ? h('div', {class: 'rp-stats'}, h('p', {class: 'micro dl'}, ROLE_LABEL[role] + ' · pred.gg'), h('dl', null,
       [['Win rate', fmtPct(rl.winRate)], ['Pick rate', fmtPct(rl.pickRate)], ['Ban rate', fmtPct(rl.banRate)], ['Matches', fmtInt(rl.matches)]].map(([k, val]) => h('div', null, h('dt', {class: 'micro'}, k), h('dd', {class: 'num'}, val))))) : null,
     h('p', {class: 'note'}, 'Only the roles pred.gg lists for ' + x.name + '. Win rate in the role, patch ' + SNAPSHOT.rolePatch + '.'));
@@ -2941,7 +2941,7 @@ Views.home = () => {
       h('div', {class: 'leg'}, h('span', null, h('i'), x.name), h('span', null, h('i', {class: 'b'}), 'Average ' + ROLE_LABEL[role]))]
     : h('p', {class: 'empty-note'}, 'The category profile appears once ' + x.name + ' is evaluated as ' + ROLE_LABEL[role] + '.'));
   const near = e ? others.slice(clamp(e.rank - 3, 0, Math.max(0, others.length - 5)), clamp(e.rank - 3, 0, Math.max(0, others.length - 5)) + 5) : [];
-  const ctx = card('ctx', 'Ranking context · ' + ROLE_LABEL[role], near.length ? h('table', {class: 'mini'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, '#'), h('th', {class: 'l'}, 'Hero'), h('th', null, 'Score'), h('th', null, 'Win rate'), h('th', null, 'Tier'))),
+  const ctx = card('ctx', 'Ranking context · ' + ROLE_LABEL[role], near.length ? h('table', {class: 'mini'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, '#'), h('th', {class: 'l'}, 'Hero'), h('th', null, 'AXR'), h('th', null, 'Win rate'), h('th', null, 'Tier'))),
       h('tbody', null, near.map(o => { const ol = live(o.id, role); return h('tr', {class: 'go' + (o.id === x.id ? ' on' : ''), onclick: () => { Store.ui.heroRole[o.id] = role; App.go('hero.' + o.id); }},
         h('td', {class: 'l num'}, o.rank), h('td', {class: 'l'}, h('span', {class: 'heroCell'}, h('img', {src: HERO[o.id].icon, alt: ''}), h('b', null, HERO[o.id].name))), h('td', {class: 'num'}, fmt1(o.score)), h('td', {class: 'num muted'}, ol ? fmtPct(ol.winRate) : '—'), h('td', null, o.tier)); })))
     : h('p', {class: 'empty-note'}, 'No ranking yet for ' + ROLE_LABEL[role] + ' in patch ' + patch + '.'));
@@ -2951,11 +2951,11 @@ Views.home = () => {
   const ch = OfficialMeta.changes(patch), up = ch.filter(c => c.d > 0).sort((a, b) => b.d - a.d).slice(0, 4), down = ch.filter(c => c.d < 0).sort((a, b) => a.d - b.d).slice(0, 4);
   const movers = card('mov', 'Biggest movers · own evaluation', ch.length ? h('ul', {class: 'mlist'}, up.map(c => heroRow(c.id, c.role, signed(c.d), ROLE_LABEL[c.role] + ' · ' + fmt1(c.prevScore) + ' → ' + fmt1(c.score), 'up')), down.map(c => heroRow(c.id, c.role, signed(c.d), ROLE_LABEL[c.role] + ' · ' + fmt1(c.prevScore) + ' → ' + fmt1(c.score), 'down')))
       : h('p', {class: 'empty-note'}, 'Risers and fallers appear once a hero is published in two patches.'),
-    h('p', {class: 'note'}, 'Role score against the previous evaluated patch'));
+    h('p', {class: 'note'}, 'AXR against the previous evaluated patch'));
   const tiersC = card('tiers', 'Tiers by role · patch ' + patch, h('ul', {class: 'htiers'}, OfficialMeta.all(patch).map(m => h('li', {class: 'go', tabindex: '0', role: 'link', onclick: () => { Store.ui.role = Store.ui.rkRole = m.role; App.go('rankings'); }, onkeydown: ev => { if (ev.key === 'Enter'){ Store.ui.role = Store.ui.rkRole = m.role; App.go('rankings'); } }},
       h('span', {class: 'micro ink'}, roleIcon(m.role), ' ', ROLE_LABEL[m.role]), h('span', {class: 'tdist', 'aria-hidden': 'true'}, m.n ? m.tierCounts.map((t, i) => t.n ? h('i', {class: 't' + Math.min(i, 5), style: {flexGrow: t.n}, title: t.t + ': ' + t.n}) : null) : h('i', {class: 'none', style: {flexGrow: 1}})), h('span', {class: 'num muted'}, m.n ? fmt1(m.avg) : '—')))),
     h('p', {class: 'tlegend', 'aria-hidden': 'true'}, Store.config.tiers.map((t, i) => h('span', null, h('i', {class: 't' + Math.min(i, 5)}), t.t))),
-    h('p', {class: 'note'}, 'Bar: share of each tier, best on the left · number: average role score'));
+    h('p', {class: 'note'}, 'Bar: share of each tier, best on the left · number: average AXR'));
   const ob = observed(patch, 'All'), mp = ob.list.slice().sort((a, b) => b.s.matches - a.s.matches).slice(0, 6);
   const played = card('played', 'Most played · ' + Stats.srcLabel(...mp.map(o => o.s.src)), mp.length ? h('ul', {class: 'mlist'}, mp.map(o => heroRow(o.id, null, fmtPct(o.s.winRate), fmtInt(o.s.matches) + ' matches · pick ' + fmtPct(o.s.pickRate)))) : h('p', {class: 'empty-note'}, 'No observed statistics for this patch.'),
     provenance(ob.src, ob.total));
@@ -2978,7 +2978,7 @@ Views.home = () => {
       h('div', {class: 'dash row3'}, movers, tiersC, played)),
     h('section', {class: 'sec home-roles'}, h('div', {class: 'sec-head'}, h('div', null, micro('Patch ' + patch, 'rule'), h('h2', {class: 'h2', style: {marginTop: '14px'}}, 'The best in every role')), link('rankings', {class: 'pill sm'}, 'All rankings →')),
       h('div', {class: 'rgrid'}, cols)),
-    h('nav', {class: 'home-links', 'aria-label': 'Explore'}, [['rankings', 'Rankings', 'Every role, ranked by role score'], ['meta', 'Meta', 'Movers, tiers and observed matches'], ['heroes', 'Heroes', 'All heroes with roles and numbers'], ['methodology', 'Methodology', 'How a score is made']].map(([r, t, d]) => link(r, {class: 'hl-item'}, h('b', null, t), h('span', {class: 'note'}, d), h('span', {class: 'hl-arrow', 'aria-hidden': 'true'}, '→'))))));
+    h('nav', {class: 'home-links', 'aria-label': 'Explore'}, [['rankings', 'Rankings', 'Every role, ranked by AXR'], ['meta', 'Meta', 'Movers, tiers and observed matches'], ['heroes', 'Heroes', 'All heroes with roles and numbers'], ['methodology', 'Methodology', 'How AXR is calculated']].map(([r, t, d]) => link(r, {class: 'hl-item'}, h('b', null, t), h('span', {class: 'note'}, d), h('span', {class: 'hl-arrow', 'aria-hidden': 'true'}, '→'))))));
 };
 
 /* ================================= HEROES =================================
@@ -2986,7 +2986,7 @@ Views.home = () => {
    of one clearly named role. No hover pop-up. */
 Views.heroes = () => {
   const s = App.s.heroes, grid = h('div', {class: 'hgrid'});
-  const SORTS = [['name', 'Name'], ['score', 'Role score'], ['wr', 'Win rate'], ['pr', 'Pick rate'], ['rating', 'User rating']].filter(o => COMMUNITY || o[0] !== 'rating');
+  const SORTS = [['name', 'Name'], ['score', 'AXR'], ['wr', 'Win rate'], ['pr', 'Pick rate'], ['rating', 'User rating']].filter(o => COMMUNITY || o[0] !== 'rating');
   if (!SORTS.some(o => o[0] === s.sort)) s.sort = 'name';
   /* Role context of an entry. With a role filter it is that role. Under "All" it is the hero's
      best rated role; without any evaluation, the role with the most matches. */
@@ -3058,7 +3058,7 @@ Views.hero = args => {
       h('button', {class: 'pill sm', type: 'button', onclick: () => Exporter.open('hero', {id: x.id, role})}, 'Share card')),
     /* Three kinds of numbers, each under its own label: own evaluation · observed · community. */
     h('div', {class: 'hd-groups'},
-      h('div', {class: 'hd-g'}, h('p', {class: 'srctag'}, 'Own evaluation'), h('div', {class: 'hd-stats'}, stat(e ? fmt1(e.score) : '—', 'Role score'), stat(e ? '#' + e.rank : '—', 'Role rank'), stat(e ? e.tier : '—', 'Tier'))),
+      h('div', {class: 'hd-g'}, h('p', {class: 'srctag'}, 'Own evaluation'), h('div', {class: 'hd-stats'}, stat(e ? fmt1(e.score) : '—', 'AXR'), stat(e ? '#' + e.rank : '—', 'Role rank'), stat(e ? e.tier : '—', 'Tier'))),
       h('div', {class: 'hd-g obs'}, h('p', {class: 'srctag'}, lv ? (lv.src.kind === 'live' ? Stats.liveWord() + ' · ' + Stats.sourceName() : 'Snapshot · pred.gg') : 'Statistics'),
         h('div', {class: 'hd-stats'}, stat(lv ? fmtPct(lv.winRate) : '—', 'Win rate', 'sm'), stat(lv ? fmtPct(lv.pickRate) : '—', 'Pick rate', 'sm'), stat(lv ? fmtInt(lv.matches) : '—', 'Matches', 'sm')),
         h('p', {class: 'micro hd-fresh'}, lv ? [h('span', null, lv.src.roles === 'explicit' ? ROLE_LABEL[role] : 'All roles'), ' · ', h('span', null, lv.src.kind === 'live' ? 'updated' : 'snapshot of'), ' ', h('span', null, lv.src.kind === 'live' ? timeAgo(lv.src.updatedAt) : fmtDate(lv.src.updatedAt))] : 'No data for this patch')),
@@ -3074,7 +3074,7 @@ Views.hero = args => {
       h('li', {class: 'total'}, h('span', {class: 'micro ink'}, 'Total'), h('span'), h('span'), h('span', {class: 'num'}, e.score.toFixed(2)))); };
   const breakdown = () => h('div', {class: 'table-wrap'}, h('table', {class: 'data'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, 'Category'), h('th', null, 'Rating'), h('th', {class: 'hide-m', 'aria-hidden': 'true'}), h('th', null, 'Weight'), h('th', null, 'Contribution'))),
     h('tbody', null, Engine.contributions(e.ev.c, role).map(r => h('tr', null, h('td', {class: 'l'}, CAT[r.cat].label), h('td', null, Math.round(r.rating)), h('td', {class: 'hide-m', style: {width: '34%'}, 'aria-hidden': 'true'}, h('span', {class: 'mbar'}, h('i', {style: {width: r.rating + '%'}}))), h('td', {class: 'muted'}, r.weight + '%'), h('td', null, r.contribution.toFixed(2)))),
-      h('tr', null, h('td', {class: 'l win'}, 'Role score'), h('td'), h('td', {class: 'hide-m'}), h('td', {class: 'muted'}, '100%'), h('td', {class: 'win'}, e.score.toFixed(2))))));
+      h('tr', null, h('td', {class: 'l win'}, 'AXR'), h('td'), h('td', {class: 'hide-m'}), h('td', {class: 'muted'}, '100%'), h('td', {class: 'win'}, e.score.toFixed(2))))));
   /* ROLE PROFILE and KEY INSIGHTS are worded from the category ratings by fixed rules. */
   const profile = () => { const top = topCats(e.ev.c, role, 3).filter(k => e.ev.c[k] >= 70);
     return top.length ? h('ul', {class: 'profile'}, top.map(k => h('li', null, h('span', null, CAT_PHRASE[k]), h('small', {class: 'micro'}, levelOf(e.ev.c[k]) + ' · ' + Math.round(e.ev.c[k])))))
@@ -3098,7 +3098,7 @@ Views.hero = args => {
     h('div', {style: {marginTop: '26px'}}, [5, 4, 3, 2, 1].map(n => { const p = agg.count ? agg.dist[n - 1] / agg.count * 100 : 0; return h('div', {class: 'dist'}, h('span', null, n + ' ★'), h('span', {class: 'bar'}, h('i', {style: {width: p + '%'}})), h('span', {class: 'muted', style: {textAlign: 'right'}}, Math.round(p) + '%')); })));
   const hist = Engine.history(x.id, role);
   const scoreChart = () => Charts.line(hist.slice().reverse().map(r => ({x: r.patch, y: r.score})), {label: x.name + ' ' + ROLE_LABEL[role] + ' score by patch: ' + hist.slice().reverse().map(r => r.patch + ' ' + fmt1(r.score)).join(', ')});
-  const scoreTable = () => hist.length ? h('div', {class: 'table-wrap'}, h('table', {class: 'data'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, 'Patch'), h('th', null, 'Role score'), h('th', null, 'Change'), h('th', null, 'Rank'), h('th', null, 'Tier'))),
+  const scoreTable = () => hist.length ? h('div', {class: 'table-wrap'}, h('table', {class: 'data'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, 'Patch'), h('th', null, 'AXR'), h('th', null, 'Change'), h('th', null, 'Rank'), h('th', null, 'Tier'))),
       h('tbody', null, hist.map((r, i) => { const older = hist[i + 1], d = older ? r.score - older.score : null; return h('tr', null, h('td', {class: 'l'}, 'Patch ' + r.patch), h('td', null, fmt1(r.score)), h('td', {class: 'muted'}, d == null ? '—' : (d >= 0 ? '+' : '') + d.toFixed(1)), h('td', null, '#' + r.rank), h('td', null, r.tier)); })))) : null;
 
   let body;
@@ -3115,9 +3115,9 @@ Views.hero = args => {
       abilitiesBlock(x.id, App.s.heroAb) ? h('div', {class: 'sec'}, micro('Abilities & skill order', 'rule'), h('div', {style: {marginTop: '22px'}}, abilitiesBlock(x.id, App.s.heroAb))) : null,
       h('div', {class: 'sec'}, micro('Base values · game data', 'rule'), h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Armor, health and scaling.'), baseStats(x.id)),
       COMMUNITY ? h('div', {class: 'split sec'}, h('div', null, micro('Community · ' + ROLE_LABEL[role], 'rule'), distBlock(), h('p', {style: {marginTop: '24px'}}, link('hero.' + x.id + '.community', {class: 'pill sm'}, 'Rate this hero →')), h('p', {class: 'note', style: {marginTop: '16px'}}, 'User ratings never change the role score.')),
-        h('div', null, micro('Role score history', 'rule'), hist.length > 1 ? h('div', {style: {marginTop: '22px'}}, scoreChart()) : h('p', {class: 'note', style: {marginTop: '22px'}}, hist.length ? 'Evaluated in one patch so far: ' + fmt1(hist[0].score) + ' in patch ' + hist[0].patch + '.' : 'No published evaluation yet.'),
+        h('div', null, micro('AXR history', 'rule'), hist.length > 1 ? h('div', {style: {marginTop: '22px'}}, scoreChart()) : h('p', {class: 'note', style: {marginTop: '22px'}}, hist.length ? 'Evaluated in one patch so far: ' + fmt1(hist[0].score) + ' in patch ' + hist[0].patch + '.' : 'No published evaluation yet.'),
           h('p', {style: {marginTop: '22px'}}, link('hero.' + x.id + '.history', {class: 'link'}, 'Full history →'))))
-        : h('div', {class: 'sec'}, micro('Role score history', 'rule'), hist.length > 1 ? h('div', {style: {marginTop: '22px'}}, scoreChart()) : h('p', {class: 'note', style: {marginTop: '22px'}}, hist.length ? 'Evaluated in one patch so far: ' + fmt1(hist[0].score) + ' in patch ' + hist[0].patch + '.' : 'No published evaluation yet.'),
+        : h('div', {class: 'sec'}, micro('AXR history', 'rule'), hist.length > 1 ? h('div', {style: {marginTop: '22px'}}, scoreChart()) : h('p', {class: 'note', style: {marginTop: '22px'}}, hist.length ? 'Evaluated in one patch so far: ' + fmt1(hist[0].score) + ' in patch ' + hist[0].patch + '.' : 'No published evaluation yet.'),
           h('p', {style: {marginTop: '22px'}}, link('hero.' + x.id + '.history', {class: 'link'}, 'Full history →'))));
   } else if (tab === 'evaluation'){
     body = e ? h('div', null, h('div', {class: 'split sec'}, h('div', null, radar(e.ev)), h('div', null, micro('Category ratings', 'rule'), h('div', {style: {marginTop: '14px'}}, catList(e.ev)), evalStatus(e.ev))),
@@ -3135,7 +3135,7 @@ Views.hero = args => {
     const lh = PredAdapter.getHeroHistory(x.id).reverse();
     const wr = Charts.line(lh.map(p => ({x: p.patch, y: p.winRate})), {unit: '%', label: x.name + ' win rate by patch'}), pr = Charts.line(lh.map(p => ({x: p.patch, y: p.pickRate, y2: p.banRate})), {unit: '%', label: x.name + ' pick and ban rate by patch'});
     body = h('div', null,
-      h('div', {class: 'sec'}, micro('Role score history · ' + ROLE_LABEL[role], 'rule'), h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Role score'), hist.length > 1 ? scoreChart() : null, hist.length ? h('div', {style: {marginTop: '22px'}}, scoreTable()) : h('p', {class: 'note'}, 'No published evaluation yet.')),
+      h('div', {class: 'sec'}, micro('AXR history · ' + ROLE_LABEL[role], 'rule'), h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Axiom Rating (AXR)'), hist.length > 1 ? scoreChart() : null, hist.length ? h('div', {style: {marginTop: '22px'}}, scoreTable()) : h('p', {class: 'note'}, 'No published evaluation yet.')),
       wr ? h('div', {class: 'sec'}, micro('Win rate history · pred.gg snapshot · all roles combined', 'rule'), h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Win rate'), wr) : null,
       pr ? h('div', {class: 'sec'}, micro('Pick rate (line) and ban rate (dashed) history · pred.gg snapshot', 'rule'), h('div', {style: {marginTop: '22px'}}, pr), h('div', {style: {marginTop: '18px'}}, sourceLine())) : null);
   } else if (tab === 'matchups'){
@@ -3185,7 +3185,7 @@ Views.rankings = () => {
     } else if (!rows.length) node = h('p', {class: 'note', style: {marginTop: '40px'}}, 'No hero matches “' + st.q + '”.');
     else if (u.rankView === 'table') node = h('div', null,
       u.sort !== 'rank' ? h('p', {class: 'banner note', style: {marginTop: '26px'}}, h('span', {class: 'micro ink'}, 'Sorted by ' + COLS.find(c => c[0] === u.sort)[1]), h('span', null, 'The # column still shows the rank in the role.')) : null,
-      sel === 'All' ? h('p', {class: 'note', style: {marginTop: '22px'}}, 'All roles together, ordered by role score. # is the rank inside the role named in the row.') : null,
+      sel === 'All' ? h('p', {class: 'note', style: {marginTop: '22px'}}, 'All roles together, ordered by AXR. # is the rank inside the role named in the row.') : null,
       h('div', {class: 'table-wrap', style: {marginTop: '22px'}}, h('table', {class: 'data rk'},
         h('thead', null, h('tr', null, COLS.map(([k, t, cls]) => h('th', {class: cls, 'aria-sort': u.sort === k ? (u.sortDir > 0 ? 'ascending' : 'descending') : null}, h('button', {type: 'button', onclick: () => setSort(k)}, t + (u.sort === k ? (u.sortDir > 0 ? ' ↑' : ' ↓') : '')))), h('th', {class: 'show-m', 'aria-label': 'Details'}))),
         h('tbody', null, (prev => sorted.flatMap(o => { const head = grouped && o.r.tier !== prev ? tierRow(prev = o.r.tier) : null; const key = o.x.id + ':' + o.role, open = st.open === key, go = () => { u.heroRole[o.x.id] = o.role; };
@@ -3233,7 +3233,7 @@ Views.gallery = (sorted, sel) => {
 
 /* Matrix: any two values against each other, one portrait per hero. */
 Views.matrix = (rows, sel) => {
-  const u = Store.ui, AX = [['score', 'Role score'], ...(sel === 'All' ? [] : ROLE_CATS[sel].map(k => [k, CAT[k].label])), ['wr', 'Win rate'], ['pr', 'Pick rate'], ['rating', 'User rating']].filter(a => COMMUNITY || a[0] !== 'rating');
+  const u = Store.ui, AX = [['score', 'AXR'], ...(sel === 'All' ? [] : ROLE_CATS[sel].map(k => [k, CAT[k].label])), ['wr', 'Win rate'], ['pr', 'Pick rate'], ['rating', 'User rating']].filter(a => COMMUNITY || a[0] !== 'rating');
   if (!AX.some(a => a[0] === u.mx)) u.mx = 'score'; if (!AX.some(a => a[0] === u.my)) u.my = 'wr';
   const get = (o, k) => k === 'score' ? o.r.score : k === 'wr' ? (o.lv ? o.lv.winRate : null) : k === 'pr' ? (o.lv ? o.lv.pickRate : null) : k === 'rating' ? (o.ag.count ? o.ag.avg : null) : o.r.ev.c[k];
   const name = k => AX.find(a => a[0] === k)[1], pts = rows.map(o => ({o, x: get(o, u.mx), y: get(o, u.my)})).filter(p => p.x != null && p.y != null);
@@ -3247,7 +3247,7 @@ Views.matrix = (rows, sel) => {
     svg.append(S('line', {class: 'ax', x1: L, x2: W - R, y1: H - B, y2: H - B}), S('line', {class: 'ax', x1: L, x2: L, y1: T, y2: H - B}), S('text', {x: W - R, y: H - 8, 'text-anchor': 'end'}, name(u.mx) + ' →'), S('text', {x: L, y: 12}, '↑ ' + name(u.my)));
     pts.forEach(p => { const cx = X(p.x), cy = Y(p.y), id = p.o.x.id;
       const a = S('a', {href: '#hero.' + id, 'aria-label': p.o.x.name + ': ' + name(u.mx) + ' ' + p.x.toFixed(1) + ', ' + name(u.my) + ' ' + p.y.toFixed(1)}, S('circle', {cx, cy, r: 17}), S('image', {href: p.o.x.icon, x: cx - 15, y: cy - 15, width: 30, height: 30, style: 'clip-path:circle(50%)'}));
-      wireTip(tip, a, () => [h('b', null, p.o.x.name), h('span', null, ROLE_LABEL[p.o.role]), h('br'), h('span', null, name(u.mx) + ': ' + p.x.toFixed(1)), h('br'), h('span', null, name(u.my) + ': ' + p.y.toFixed(1)), h('br'), h('span', null, 'Role score ' + fmt1(p.o.r.score)), ' · #' + p.o.r.rank]);
+      wireTip(tip, a, () => [h('b', null, p.o.x.name), h('span', null, ROLE_LABEL[p.o.role]), h('br'), h('span', null, name(u.mx) + ': ' + p.x.toFixed(1)), h('br'), h('span', null, name(u.my) + ': ' + p.y.toFixed(1)), h('br'), h('span', null, 'AXR ' + fmt1(p.o.r.score)), ' · #' + p.o.r.rank]);
       a.addEventListener('click', () => { u.heroRole[id] = p.o.role; });
       svg.append(a); });
   }
@@ -3297,7 +3297,7 @@ Views.compare = () => {
       h('div', {class: 'sec', style: {marginTop: '48px'}}, h('div', {class: 'sec-head'}, micro('Head to head · patch ' + patch, 'rule'), h('button', {class: 'pill sm', type: 'button', onclick: () => Exporter.open('compare', {a: A, b: B})}, 'Share comparison')),
         h('div', {class: 'table-wrap'}, h('table', {class: 'data cmp'}, h('tbody', null,
           h('tr', {class: 'grp'}, h('td', {colSpan: 3}, h('span', {class: 'srctag'}, 'Own evaluation'))),
-          line('Role score', a.e && a.e.score, b.e && b.e.score, fmt1), line('Role rank', a.e && a.e.rank, b.e && b.e.rank, v => '#' + v, true),
+          line('AXR', a.e && a.e.score, b.e && b.e.score, fmt1), line('Role rank', a.e && a.e.rank, b.e && b.e.rank, v => '#' + v, true),
           h('tr', null, h('td', null, a.e ? a.e.tier : '—'), h('td', null, 'Tier'), h('td', {style: {textAlign: 'right'}}, b.e ? b.e.tier : '—')),
           h('tr', {class: 'grp'}, h('td', {colSpan: 3}, h('span', {class: 'srctag'}, Stats.srcLabel(a.lv && a.lv.src, b.lv && b.lv.src)))),
           line('Win rate', a.lv && a.lv.winRate, b.lv && b.lv.winRate, fmtPct), line('Pick rate', a.lv && a.lv.pickRate, b.lv && b.lv.pickRate, fmtPct), line('Matches', a.lv && a.lv.matches, b.lv && b.lv.matches, fmtInt),
@@ -3351,13 +3351,13 @@ Views.methodology = () => {
     sec('Categories', 'What is rated.', h('dl', {class: 'mcats'}, CATS.map(c => h('div', null, h('dt', null, c.label), h('dd', {class: 'note'}, CAT_DEF[c.id].what))))),
     sec('Three kinds of numbers', 'Never mixed.', h('div', {class: 'mkinds'},
       h('div', null, micro('Own evaluation', 'ink'), h('p', null, 'Our structured rating per hero, role and patch. Only it decides score, rank and tier.')),
-      h('div', null, micro('Live · observed matches', 'ink'), h('p', null, 'Win rate, pick rate and matches from recent completed matches, collected by the PRED RANK backend. Without it the embedded pred.gg snapshot is shown, labelled as a snapshot.')),
+      h('div', null, micro('Live · observed matches', 'ink'), h('p', null, 'Win rate, pick rate and matches from recent completed matches, collected by the AXIOM backend. Without it the embedded pred.gg snapshot is shown, labelled as a snapshot.')),
       COMMUNITY ? h('div', null, micro('Community', 'ink'), h('p', null, 'What users think, one to five stars. Never part of the score.')) : null),
       h('p', {class: 'lead', style: {marginTop: '22px'}}, COMMUNITY ? 'Role score ≠ win rate ≠ user rating.' : 'Role score ≠ win rate.'),
       h('p', {class: 'note', style: {marginTop: '10px'}}, 'A high win rate never raises a role score, and a low one never lowers it.'),
       h('div', {style: {marginTop: '16px'}}, sourceLine())),
     sec('Observed data', 'What the statistics mean.', h('dl', {class: 'mcats'}, [
-      ['Source', 'The PRED RANK backend collects completed matches from the source it is connected to and serves them to this page. The page never asks Omeda or pred.gg for matches itself. Live means recent completed matches, not games in progress.'],
+      ['Source', 'The AXIOM backend collects completed matches from the source it is connected to and serves them to this page. The page never asks Omeda or pred.gg for matches itself. Live means recent completed matches, not games in progress.'],
       ['Coverage and sample', 'Every block names how many matches it is based on and which period they cover.'],
       ['Win rate', 'Matches won ÷ matches played by the hero.'],
       ['Pick rate', 'Matches with the hero ÷ all observed matches × 100, counted only in complete matches with ten players. With ten heroes per match all heroes add up to 1000 %. Per role: matches with the hero in that role ÷ matches in which every player has a role; two per match, so one role adds up to 200 %.'],
@@ -3398,8 +3398,8 @@ Views.account = () => {
         Auth.isAdmin ? h('p', {style: {marginTop: '30px'}}, link('admin', {class: 'pill solid'}, 'Open admin →')) : null),
       h('div', null,
         p === 'supabase' ? (Auth.id ? [
-          h('p',{class:'lead'},'This account is connected to the shared PRED/RANK database. Changes allowed for your role are synchronised across devices.'),
-          !Auth.isAdmin ? h('div',{class:'empty',style:{marginTop:'22px'}},micro('Owner setup','ink'),h('p',{class:'note'},'If this is the first account ever created for this PRED/RANK database, claim the owner role before you share the public link.'),h('button',{class:'pill sm solid',type:'button',onclick:async()=>{try{const ok=await Auth.claimOwner();toast(ok?'Owner/admin role activated.':'An owner already exists.');}catch(e){toast(e&&e.message?e.message:'Could not claim owner.');}}},'Claim initial owner')) : null,
+          h('p',{class:'lead'},'This account is connected to the shared AXIOM database. Changes allowed for your role are synchronised across devices.'),
+          !Auth.isAdmin ? h('div',{class:'empty',style:{marginTop:'22px'}},micro('Owner setup','ink'),h('p',{class:'note'},'If this is the first account ever created for this AXIOM database, claim the owner role before you share the public link.'),h('button',{class:'pill sm solid',type:'button',onclick:async()=>{try{const ok=await Auth.claimOwner();toast(ok?'Owner/admin role activated.':'An owner already exists.');}catch(e){toast(e&&e.message?e.message:'Could not claim owner.');}}},'Claim initial owner')) : null,
           h('p',{style:{marginTop:'22px'}},h('button',{class:'pill sm',type:'button',onclick:()=>Auth.signOut()},'Sign out'))
         ] : [
           h('p',{class:'lead'},'Sign in to rate heroes. Admin rights are checked by the server; public visitors can read the site without an account.'),
@@ -3615,7 +3615,7 @@ function metaOverview(patch, role, setRole){
 /* OBSERVED MATCHES: the live backend when it has data, otherwise the embedded snapshot. */
 function liveMeta(patch, role, tip){
   const ob = observed(patch, role), lm = LiveAdapter.has() ? LiveAdapter.getMeta(patch) : null;
-  const out = [sourceHead('obs', 'Observed matches', ob.src && ob.src.kind === 'live' ? 'Recent completed matches collected by the PRED RANK backend.' : LiveAdapter.state === 'LOADING' ? 'Checking the live backend …' : 'No live backend data right now, so the embedded pred.gg snapshot is shown.', ob.list.map(o => o.s.src))];
+  const out = [sourceHead('obs', 'Observed matches', ob.src && ob.src.kind === 'live' ? 'Recent completed matches collected by the AXIOM backend.' : LiveAdapter.state === 'LOADING' ? 'Checking the live backend …' : 'No live backend data right now, so the embedded pred.gg snapshot is shown.', ob.list.map(o => o.s.src))];
   if (!ob.list.length){ out.push(h('div', {class: 'empty'}, h('p', {class: 'h3'}, 'No observed statistics for patch ' + patch + '.'), provenance(null))); return out; }
   out.push(provenance(ob.src, ob.total, role !== 'All' && ob.src && ob.src.roles !== 'explicit' ? 'Role filter: heroes of the role, numbers of all roles' : null));
   const enough = ob.list.filter(o => o.s.matches >= MIN_OBS), most = ob.list.slice().sort((a, b) => b.s.matches - a.s.matches).slice(0, 10);
@@ -3894,7 +3894,7 @@ AdminViews.users = () => {
 AdminViews.data = () => {
   const st = App.s.adm, kv = (k, v) => h('div', {class: 'kv'}, h('dt', null, k), h('dd', null, v)), L = LiveAdapter, hl = L.health, cp = L.caps, yes = b => b ? 'yes' : 'no';
   const when = iso => iso ? fmtDate(iso) + ' ' + String(iso).slice(11, 16) + ' UTC · ' + timeAgo(iso) : '—';
-  const urlIn = h('input', {class: 'field', id: 'live-url', type: 'url', value: Store.config.liveApi || '', placeholder: 'https://pred-rank-live.example.workers.dev', autocomplete: 'off', spellcheck: false});
+  const urlIn = h('input', {class: 'field', id: 'live-url', type: 'url', value: Store.config.liveApi || '', placeholder: 'https://axiom-live.example.workers.dev', autocomplete: 'off', spellcheck: false});
   const tokIn = h('input', {class: 'field', id: 'live-token', type: 'password', value: st.token || '', placeholder: 'ADMIN_TOKEN', autocomplete: 'off', oninput: e => { st.token = e.target.value; }});
   const run = (path, method, key) => { if (!st.token){ toast('Enter the admin token first.'); return; } st.busy = key; App.render();
     L.admin(path, st.token, method).then(j => { st[key] = j.data || j; st.err = null; if (key === 'sync' || key === 'rebuild') L.refresh(true); }).catch(e => { st.err = e && e.message || 'Request failed'; }).then(() => { st.busy = null; App.render(); }); };
@@ -3984,7 +3984,7 @@ AdminViews.settings = () => {
 /* 'live' only for numbers from the live backend; the embedded data is a snapshot. */
 const obsTag = s => s && s.src && s.src.kind === 'live' ? 'live' : 'snapshot';
 const Exporter = {
-  canvas: null, name: 'predrank.png',
+  canvas: null, name: 'axiom.png',
   img(src){ return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }); },
   async base(W, H){
     try { await Promise.all([document.fonts.load('300 80px "Inter"'), document.fonts.load('400 16px "Inter"')]); } catch (e) {}
@@ -3997,7 +3997,7 @@ const Exporter = {
   micro(c, t, x, y, align){ this.font(c, 400, 11); c.fillStyle = '#9a9a9a'; c.textAlign = align || 'left'; try { c.letterSpacing = '2px'; } catch (e) {} c.fillText(String(I18n.tr(String(t))).toUpperCase(), x, y); try { c.letterSpacing = '0px'; } catch (e) {} },
   fit(c, t, w, max, min, weight){ let s = max; this.font(c, weight || 300, s); while (c.measureText(t).width > w && s > min){ s -= 2; this.font(c, weight || 300, s); } return s; },
   veil(c, W, H, fromX){ const g = c.createLinearGradient(fromX, 0, W, 0); g.addColorStop(0, '#0b0b0c'); g.addColorStop(.55, 'rgba(11,11,12,0)'); c.fillStyle = g; c.fillRect(fromX, 0, W - fromX, H); const g2 = c.createLinearGradient(0, H * .55, 0, H); g2.addColorStop(0, 'rgba(11,11,12,0)'); g2.addColorStop(1, '#0b0b0c'); c.fillStyle = g2; c.fillRect(0, H * .55, W, H * .45); },
-  foot(c, W, H){ this.micro(c, 'PRED RANK · Patch ' + Store.patch() + ' · ' + I18n.tr(COMMUNITY ? 'role score ≠ win rate ≠ user rating' : 'role score ≠ win rate'), 56, H - 34); this.micro(c, new Date().toLocaleDateString('de-DE'), W - 56, H - 34, 'right'); },
+  foot(c, W, H){ this.micro(c, 'AXIOM · Patch ' + Store.patch() + ' · ' + I18n.tr(COMMUNITY ? 'role score ≠ win rate ≠ user rating' : 'role score ≠ win rate'), 56, H - 34); this.micro(c, new Date().toLocaleDateString('de-DE'), W - 56, H - 34, 'right'); },
   async ranking(o){
     const rows = Engine.ranking(Store.patch(), o.role), W = 1200, H = 250 + rows.length * 50 + 70, {cv, c} = await this.base(W, H);
     c.fillStyle = 'rgba(11,11,12,.55)'; c.fillRect(0, 200, W, H);
@@ -4009,7 +4009,7 @@ const Exporter = {
       if (im){ c.save(); c.beginPath(); c.arc(136, y + 17, 15, 0, 6.3); c.clip(); c.drawImage(im, 121, y + 2, 30, 30); c.restore(); }
       c.fillStyle = '#fff'; this.font(c, 400, 19); c.fillText(HERO[r.id].name, 166, y + 24);
       c.textAlign = 'right'; this.font(c, 600, 19); c.fillText(fmt1(r.score), 690, y + 24); this.font(c, 400, 19); c.fillText(r.tier, 800, y + 24); c.fillStyle = '#9a9a9a'; c.fillText(lv ? fmtPct(lv.winRate) : '—', 960, y + 24); c.fillText(COMMUNITY ? (ag.count ? ag.avg.toFixed(1) + ' ★' : '—') : (lv ? fmtInt(lv.matches) : '—'), 1144, y + 24); }
-    this.foot(c, W, H); return {cv, name: 'predrank-' + o.role.toLowerCase() + '-' + Store.patch() + '.png'};
+    this.foot(c, W, H); return {cv, name: 'axiom-' + o.role.toLowerCase() + '-' + Store.patch() + '.png'};
   },
   async hero(o){
     const W = 1200, H = 630, {cv, c} = await this.base(W, H), x = HERO[o.id], e = official(o.id, o.role), lv = live(o.id, o.role), ag = Ratings.aggregate(o.id, o.role), art = await this.img(x.art);
@@ -4019,7 +4019,7 @@ const Exporter = {
     const cols = [[e ? fmt1(e.score) : '—', 'Role score'], [e ? '#' + e.rank : '—', 'Role rank'], [e ? e.tier : '—', 'Tier'], [lv ? fmtPct(lv.winRate) : '—', 'Win rate · ' + obsTag(lv)], COMMUNITY ? [ag.count ? ag.avg.toFixed(1) + ' / 5' : '—', 'User rating'] : [lv ? fmtInt(lv.matches) : '—', 'Matches · ' + obsTag(lv)]];
     c.strokeStyle = 'rgba(255,255,255,.3)'; c.beginPath(); c.moveTo(56, 420); c.lineTo(W - 56, 420); c.stroke();
     cols.forEach(([v, l], i) => { const cx = 56 + i * 218; c.fillStyle = '#fff'; c.textAlign = 'left'; this.font(c, 300, 44); c.fillText(v, cx, 490); this.micro(c, l, cx, 520); });
-    this.foot(c, W, H); return {cv, name: 'predrank-' + x.id + '.png'};
+    this.foot(c, W, H); return {cv, name: 'axiom-' + x.id + '.png'};
   },
   async compare(o){
     const A = o.a, B = o.b, cats = CATS.map(k => k.id).filter(k => ROLE_CATS[A.role].includes(k) || ROLE_CATS[B.role].includes(k)), W = 1200, H = 430 + cats.length * 40 + 70, {cv, c} = await this.base(W, H);
@@ -4033,7 +4033,7 @@ const Exporter = {
     row('Role score', ea && ea.score, eb && eb.score, 260, fmt1); row('Role rank', ea && ea.rank, eb && eb.rank, 300, v => '#' + v, true);
     const la = live(A.id, A.role), lb = live(B.id, B.role); row('Win rate · ' + (la && lb && obsTag(la) !== obsTag(lb) ? 'live / snapshot' : obsTag(la || lb)), la && la.winRate, lb && lb.winRate, 340, fmtPct);
     cats.forEach((k, i) => row(CAT[k].short, ea && ROLE_CATS[A.role].includes(k) ? ea.ev.c[k] : null, eb && ROLE_CATS[B.role].includes(k) ? eb.ev.c[k] : null, 410 + i * 40, v => String(Math.round(v))));
-    this.foot(c, W, H); return {cv, name: 'predrank-' + A.id + '-vs-' + B.id + '.png'};
+    this.foot(c, W, H); return {cv, name: 'axiom-' + A.id + '-vs-' + B.id + '.png'};
   },
   async open(kind, o){
     const r = await this[kind](o); this.canvas = r.cv; this.name = r.name;
@@ -4062,7 +4062,7 @@ const Shell = {
       h('i', {class: has(p) ? 'has' : '', title: has(p) ? 'Has evaluations' : null}), h('span', {class: 'num'}, p), h('span', {class: 'pn'}, PATCH_NAMES[p] || (SNAPSHOT.stats[p] ? '' : 'custom')), h('span', {class: 'pd num'}, fmtDate(SNAPSHOT.dates[p]))))) : null;
     const items = [['home', 'Home'], ['heroes', 'Heroes'], ['rankings', 'Rankings'], ['meta', 'Meta'], ['compare', 'Compare'], ['community', 'Community']].filter(i => COMMUNITY || i[0] !== 'community').concat(Auth.isAdmin ? [['admin', 'Admin']] : []);
     return h('header', {class: 'nav' + (scrollY > 30 || !['home', 'hero', 'compare'].includes(route.view) ? ' solid' : ''), id: 'nav'},
-      link('home', {class: 'brand', 'aria-label': 'PRED RANK, start page'}, brandMark()),
+      link('home', {class: 'brand', 'aria-label': 'AXIOM, start page'}, brandMark()),
       h('nav', {class: 'nav-links', 'aria-label': 'Main'}, items.map(([k, t]) => link(k, {'aria-current': cur(k)}, t))),
       h('div', {class: 'nav-right'},
         h('div', {class: 'pp'}, h('button', {class: 'pill sm', type: 'button', id: 'patch-btn', 'aria-haspopup': 'listbox', 'aria-expanded': String(this.pickerOpen), onclick: e => { e.stopPropagation(); this.pickerOpen = !this.pickerOpen; App.render(); }}, 'Patch ' + patch, h('span', {'aria-hidden': 'true'}, '⌄')), picker),
@@ -4075,9 +4075,9 @@ const Shell = {
   },
   foot(){
     return h('footer', {class: 'wrap'}, h('div', {class: 'foot'},
-      h('div', {class: 'foot-a'}, h('p', {class: 'brand'}, brandMark()), h('p', {class: 'foot-claim'}, 'Hero rankings for Predecessor, by role and patch.')),
+      h('div', {class: 'foot-a'}, h('p', {class: 'brand'}, brandMark()), h('p', {class: 'foot-claim'}, 'Predecessor Competitive Intelligence · Rankings, meta and hero analytics.')),
       h('dl', {class: 'foot-src'},
-        h('div', null, h('dt', null, 'Role scores'), h('dd', null, 'Own evaluation')),
+        h('div', null, h('dt', null, 'AXR'), h('dd', null, 'Axiom Rating')),
         h('div', null, h('dt', null, 'Statistics'), h('dd', null, h('span', {class: 'status-dot ' + (LiveAdapter.state === 'LIVE' ? 'live' : 'off'), 'aria-hidden': 'true'}), LiveAdapter.has() ? Stats.liveWord() + ' · ' + Stats.sourceName() : 'pred.gg · snapshot ' + fmtDate(PredAdapter.snapshotAt))),
         h('div', null, h('dt', null, 'Game data'), h('dd', null, 'omeda.city'))),
       h('div', {class: 'foot-b'}, h('p', null, 'Fan project. Not affiliated with or endorsed by Omeda Studios. Predecessor and all hero artwork are the property of their respective owners.'),
@@ -4141,7 +4141,7 @@ const App = {
   });
   $('#dlg-img-save').onclick = () => Exporter.saveFile(); $('#dlg-img-copy').onclick = () => Exporter.copy();
   $('#dlg-code-copy').onclick = async () => { const t = $('#dlg-code-out'); t.select(); try { await navigator.clipboard.writeText(t.value); $('#dlg-code-msg').textContent = 'Copied.'; } catch (e) { $('#dlg-code-msg').textContent = 'Select the text and copy it with Ctrl+C.'; } };
-  $('#dlg-code-load').onclick = () => { if (Admin.importConfig($('#dlg-code-in').value)) $('#dlg-code').close(); else $('#dlg-code-msg').textContent = 'This is not a valid PRED/RANK backup code.'; };
+  $('#dlg-code-load').onclick = () => { if (Admin.importConfig($('#dlg-code-in').value)) $('#dlg-code').close(); else $('#dlg-code-msg').textContent = 'This is not a valid AXIOM backup code.'; };
   document.querySelectorAll('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
   Auth.init().then(() => Sync.init());
   PredAdapter.refresh();
