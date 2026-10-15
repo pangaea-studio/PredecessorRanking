@@ -11,7 +11,7 @@
 <script>
 (async()=>{
   try{
-    let src=await fetch('/app.html?v=20261015-admin-users-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();});
+    let src=await fetch('/app.html?v=20261015-patch-watch-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();});
     const marker='/* DATA / API: the live backend';
     const at=src.indexOf(marker);
     if(at<0)throw new Error('AXIOM admin patch marker not found');
@@ -79,6 +79,68 @@ AdminViews.users = () => {
     h('p',{class:'note',style:{marginTop:'20px'}},tr('For safety you cannot remove your own admin role from this page. Another admin can change your role.','Zur Sicherheit kannst du dir auf dieser Seite die eigene Admin-Rolle nicht entziehen. Ein anderer Admin kann deine Rolle ändern.'))
   );
 };
+
+/* ======================== AUTOMATIC PATCH CARRY-FORWARD ====================
+   A new game patch becomes the current AXIOM patch automatically. Until a hero is
+   re-published for that patch, the last published AXR stays visible and is clearly
+   marked as coming from the older patch. Draft work never replaces the old public
+   value until the new evaluation is published. */
+const AxiomPatchCarry = {
+  rev: -1, memo: {},
+  reset(){ if (this.rev !== Store.rev){ this.rev = Store.rev; this.memo = {}; } },
+  exactRows(patch, role){
+    const set = Store.evals[patch + ':' + role] || {};
+    const rows = Object.keys(set).filter(id => validHeroRole(id, role) && Engine.isPublic(set[id], role)).map(id => ({id, ev:set[id], score:Engine.score(set[id].c, role), sourcePatch:null}))
+      .sort((a,b) => b.score - a.score || HERO[a.id].name.localeCompare(HERO[b.id].name));
+    rows.forEach((r,i) => { r.rank=i+1; r.tier=Engine.tier(r.score); });
+    rows.byId = Object.fromEntries(rows.map(r => [r.id,r]));
+    return rows;
+  },
+  sourcePatch(patch, role){
+    const all = Store.patches(), start = all.indexOf(patch);
+    if (start < 0) return null;
+    for (let i=start+1;i<all.length;i++) if (this.exactRows(all[i],role).length) return all[i];
+    return null;
+  },
+  ranking(patch, role){
+    this.reset(); const key=patch+':'+role; if (this.memo[key]) return this.memo[key];
+    const exact=this.exactRows(patch,role), src=this.sourcePatch(patch,role);
+    if (!src) return this.memo[key]=exact;
+    const prev=this.exactRows(src,role), cur=exact.byId || {}, old=prev.byId || {}, ids=new Set([...Object.keys(old),...Object.keys(cur)]), rows=[];
+    ids.forEach(id => {
+      const r=cur[id] ? Object.assign({},cur[id],{sourcePatch:null}) : old[id] ? Object.assign({},old[id],{sourcePatch:src}) : null;
+      if (r) rows.push(r);
+    });
+    rows.sort((a,b)=>b.score-a.score || HERO[a.id].name.localeCompare(HERO[b.id].name));
+    rows.forEach((r,i)=>{r.rank=i+1;r.tier=Engine.tier(r.score);});
+    rows.byId=Object.fromEntries(rows.map(r=>[r.id,r]));
+    return this.memo[key]=rows;
+  },
+  info(patch){
+    const s=new Set(); ROLES.forEach(r=>this.ranking(patch,r).forEach(x=>{if(x.sourcePatch)s.add(x.sourcePatch);}));
+    return s.size ? {patch, sources:[...s]} : null;
+  }
+};
+Engine.ranking = function(patch, role){ return AxiomPatchCarry.ranking(patch, role); };
+Engine.movement = function(id, role, patch){
+  const a=this.entry(id,role,patch); if (!a || a.sourcePatch) return null;
+  const all=Store.patches(), start=all.indexOf(patch);
+  for(let i=start+1;i<all.length;i++){ const b=this.entry(id,role,all[i]); if(b && !b.sourcePatch) return b.rank-a.rank; }
+  return null;
+};
+
+function axiomCarryBanner(){
+  const info=AxiomPatchCarry.info(Store.patch()); if(!info)return null;
+  const de=I18n.lang==='de', from=info.sources.join(', '), to=info.patch;
+  return h('div',{class:'banner',style:{marginBottom:'28px'}},
+    h('span',{class:'micro ink'},de?'ÜBERNOMMENE AXR-WERTE':'INHERITED AXR VALUES'),
+    h('span',{class:'note',style:{maxWidth:'none'}},de ? ('Patch '+to+': Werte aus Patch '+from+'. Sie bleiben sichtbar, bis für '+to+' neue Bewertungen veröffentlicht werden.') : ('Patch '+to+': values from patch '+from+'. They stay visible until new '+to+' evaluations are published.')));
+}
+function wrapCarryView(name){
+  const base=Views[name]; if(typeof base!=='function')return;
+  Views[name]=function(){ const page=base.apply(this,arguments), b=axiomCarryBanner(); if(!b)return page; const w=page&&page.querySelector?page.querySelector('.wrap'):null; if(w)w.insertBefore(b,w.firstChild); return page; };
+}
+['home','rankings','meta','heroes','hero','compare'].forEach(wrapCarryView);
 
 `;
     src=src.slice(0,at)+patch+src.slice(at);
