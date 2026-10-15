@@ -1,0 +1,91 @@
+name: Apply AXIOM branding
+
+on:
+  push:
+    paths:
+      - '.github/workflows/axiom-brand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply AXIOM branding
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          repls = [
+              ('<title>PRED RANK</title>', '<title>AXIOM — Predecessor Competitive Intelligence</title>'),
+              ("h('b', null, 'PRED'), h('span', null, 'RANK')", "h('b', null, 'AXI'), h('span', null, 'OM')"),
+              ("'PRED RANK, start page'", "'AXIOM, start page'"),
+              ("'PRED RANK, Startseite'", "'AXIOM, Startseite'"),
+              ("'PRED/RANK, start page'", "'AXIOM, start page'"),
+              ("'PRED/RANK, Startseite'", "'AXIOM, Startseite'"),
+              ('PRED/RANK backup code', 'AXIOM backup code'),
+              ('PRED/RANK-Sicherungscode', 'AXIOM-Sicherungscode'),
+              ('PRED/RANK database', 'AXIOM database'),
+              ('PRED RANK backend', 'AXIOM backend'),
+              ('PRED-RANK-Backend', 'AXIOM-Backend'),
+              ('https://pred-rank-live.example.workers.dev', 'https://axiom-live.example.workers.dev'),
+              ("canvas: null, name: 'predrank.png'", "canvas: null, name: 'axiom.png'"),
+              ("'predrank-' + o.role.toLowerCase()", "'axiom-' + o.role.toLowerCase()"),
+              ("'predrank-' + x.id", "'axiom-' + x.id"),
+              ("'predrank-' + A.id", "'axiom-' + A.id"),
+              ("'PRED RANK · Patch '", "'AXIOM · Patch '"),
+              ("'Role score · ' + ROLE_LABEL[role]", "'AXR · ' + ROLE_LABEL[role]"),
+              ("h('span', null, 'Score')", "h('span', null, 'AXR')"),
+              ("h('th', null, 'Score')", "h('th', null, 'AXR')"),
+              ("['score', 'Role score']", "['score', 'AXR']"),
+              ("stat(e ? fmt1(e.score) : '—', 'Role score')", "stat(e ? fmt1(e.score) : '—', 'AXR')"),
+              ("h('td', {class: 'l win'}, 'Role score')", "h('td', {class: 'l win'}, 'AXR')"),
+              ("h('th', null, 'Role score')", "h('th', null, 'AXR')"),
+              ("micro('Role score history'", "micro('AXR history'"),
+              ("micro('Role score history · ' + ROLE_LABEL[role]", "micro('AXR history · ' + ROLE_LABEL[role]"),
+              ("h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Role score')", "h('h2', {class: 'h2', style: {margin: '14px 0 26px'}}, 'Axiom Rating (AXR)')"),
+              ("'Every role, ranked by role score'", "'Every role, ranked by AXR'"),
+              ("'How a score is made'", "'How AXR is calculated'"),
+              ("'Role score against the previous evaluated patch'", "'AXR against the previous evaluated patch'"),
+              ("'Bar: share of each tier, best on the left · number: average role score'", "'Bar: share of each tier, best on the left · number: average AXR'"),
+              ("'All roles together, ordered by role score. # is the rank inside the role named in the row.'", "'All roles together, ordered by AXR. # is the rank inside the role named in the row.'"),
+              ("'Role score ' + fmt1(r.score)", "'AXR ' + fmt1(r.score)"),
+              ("'Role score ' + fmt1(p.o.r.score)", "'AXR ' + fmt1(p.o.r.score)"),
+              ("line('Role score'", "line('AXR'"),
+              ("h('p', {class: 'foot-claim'}, 'Hero rankings for Predecessor, by role and patch.')", "h('p', {class: 'foot-claim'}, 'Predecessor Competitive Intelligence · Rankings, meta and hero analytics.')"),
+              ("h('dt', null, 'Role scores')", "h('dt', null, 'AXR')"),
+              ("h('dd', null, 'Own evaluation')", "h('dd', null, 'Axiom Rating')"),
+          ]
+          for a, b in repls:
+              s = s.replace(a, b)
+          s = s.replace('PRED/RANK', 'AXIOM').replace('PRED RANK', 'AXIOM').replace('PRED-RANK', 'AXIOM')
+          s = s.replace("'Hero rankings for Predecessor, by role and patch.': 'Helden-Rankings für Predecessor, nach Rolle und Patch.'", "'Predecessor Competitive Intelligence · Rankings, meta and hero analytics.': 'Predecessor Competitive Intelligence · Rankings, Meta und Helden-Analysen.'")
+          s = s.replace("'Role scores': 'Rollen-Scores'", "'AXR': 'AXR'")
+          s = s.replace("'Own evaluation': 'Eigene Bewertung'", "'Axiom Rating': 'Axiom Rating'")
+          s = s.replace("'Every role, ranked by role score': 'Jede Rolle, nach Rollen-Score geordnet'", "'Every role, ranked by AXR': 'Jede Rolle, nach AXR geordnet'")
+          s = s.replace("'How a score is made': 'Wie ein Score entsteht'", "'How AXR is calculated': 'Wie AXR berechnet wird'")
+          s = s.replace("'Role score against the previous evaluated patch': 'Rollen-Score gegenüber dem vorigen bewerteten Patch'", "'AXR against the previous evaluated patch': 'AXR gegenüber dem vorigen bewerteten Patch'")
+          s = s.replace("'Bar: share of each tier, best on the left · number: average role score': 'Balken: Anteil jedes Tiers, das beste links · Zahl: Ø Rollen-Score'", "'Bar: share of each tier, best on the left · number: average AXR': 'Balken: Anteil jedes Tiers, das beste links · Zahl: Ø AXR'")
+          s = s.replace("'All roles together, ordered by role score. # is the rank inside the role named in the row.': 'Alle Rollen zusammen, geordnet nach Rollen-Score. # ist der Rang innerhalb der Rolle, die in der Zeile steht.'", "'All roles together, ordered by AXR. # is the rank inside the role named in the row.': 'Alle Rollen zusammen, nach AXR geordnet. # ist der Rang innerhalb der Rolle, die in der Zeile steht.'")
+          s = s.replace('"Role score history": "Verlauf Rollen-Score"', '"AXR history": "AXR-Verlauf"')
+          s = s.replace("[/^Role score · (.+)$/, 'Rollen-Score · $1']", "[/^AXR · (.+)$/, 'AXR · $1']")
+          s = s.replace("[/^Role score history · (.+)$/, 'Verlauf Rollen-Score · $1']", "[/^AXR history · (.+)$/, 'AXR-Verlauf · $1']")
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit branded site
+        shell: bash
+        run: |
+          git config user.name "pangaea-studio-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No branding changes needed"
+            exit 0
+          fi
+          git commit -m "Rebrand PRED/RANK to AXIOM"
+          git push
