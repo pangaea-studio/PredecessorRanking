@@ -12,14 +12,13 @@
 (async()=>{
   try{
     const [app, overrides] = await Promise.all([
-      fetch('/app.html?v=20261015-audit-ux-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
-      fetch('/axiom-overrides.js?v=20261015-audit-ux-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
+      fetch('/app.html?v=20261015-no-carry-banner-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
+      fetch('/axiom-overrides.js?v=20261015-no-carry-banner-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
     ]);
     const marker='/* DATA / API: the live backend';
     const at=app.indexOf(marker);
     if(at<0)throw new Error('AXIOM override marker not found');
-    const noPublicCarryMessage='\n/* Carry-forward remains active, but no inherited-value banner is shown publicly. */\naxiomCarryBanner = function(){ return null; };\n';
-    const src=app.slice(0,at)+overrides+noPublicCarryMessage+'\n'+app.slice(at);
+    const src=app.slice(0,at)+overrides+'\n'+app.slice(at);
     document.open();
     document.write(src);
     document.close();
