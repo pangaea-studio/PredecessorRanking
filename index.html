@@ -11,139 +11,14 @@
 <script>
 (async()=>{
   try{
-    let src=await fetch('/app.html?v=20261015-patch-watch-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();});
+    const [app, overrides] = await Promise.all([
+      fetch('/app.html?v=20261015-audit-ux-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
+      fetch('/axiom-overrides.js?v=20261015-audit-ux-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
+    ]);
     const marker='/* DATA / API: the live backend';
-    const at=src.indexOf(marker);
-    if(at<0)throw new Error('AXIOM admin patch marker not found');
-    const patch=String.raw`
-/* ======================= AXIOM ACCOUNT ADMINISTRATION =======================
-   Supabase RPCs expose only the account fields an authenticated admin needs.
-   Role changes are re-checked server-side; normal users cannot call them. */
-const AdminUserAccess = {
-  rows: [], loaded: false, busy: false, error: '',
-  async load(force){
-    if (!PredSupabase || !Auth.isAdmin) return;
-    if (this.busy || (this.loaded && !force)) return;
-    this.busy = true; this.error = ''; App.invalidate();
-    try {
-      const {data, error} = await PredSupabase.rpc('list_app_users');
-      if (error) throw error;
-      this.rows = Array.isArray(data) ? data : [];
-      this.loaded = true;
-    } catch (e) { this.error = (e && e.message) || 'Could not load accounts.'; }
-    this.busy = false; App.invalidate();
-  },
-  async setAdmin(uid, makeAdmin){
-    if (!PredSupabase || !Auth.isAdmin || !uid) return;
-    this.busy = true; this.error = ''; App.invalidate();
-    try {
-      const {error} = await PredSupabase.rpc('set_user_admin', {target_user_id: uid, make_admin: !!makeAdmin});
-      if (error) throw error;
-      toast(makeAdmin ? (I18n.lang === 'de' ? 'Admin-Rechte vergeben.' : 'Admin access granted.') : (I18n.lang === 'de' ? 'Admin-Rechte entfernt.' : 'Admin access removed.'));
-      this.loaded = false;
-      await this.load(true);
-      if (uid === Auth.id) await Auth.refreshRole();
-    } catch (e) { this.error = (e && e.message) || 'Could not change access.'; }
-    this.busy = false; App.invalidate();
-  }
-};
-
-AdminViews.users = () => {
-  const de = I18n.lang === 'de', st = AdminUserAccess;
-  if (!st.loaded && !st.busy && !st.error) setTimeout(() => st.load(false), 0);
-  const rows = st.rows || [], admins = rows.filter(x => x.is_admin).length;
-  const tr = (en, ger) => de ? ger : en;
-  const when = iso => iso ? new Date(iso).toLocaleString(de ? 'de-DE' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}) : '—';
-  const role = u => h('span', {class:'tag' + (u.is_admin ? ' on' : '')}, u.is_admin ? 'Admin' : tr('User','Nutzer'));
-  const action = u => {
-    if (u.user_id === Auth.id && u.is_admin) return h('span', {class:'micro'}, tr('Your admin account','Dein Admin-Konto'));
-    if (u.is_admin) return confirmBtn(tr('Remove admin','Admin entfernen'), tr('Confirm removal','Entfernen bestätigen'), () => st.setAdmin(u.user_id, false), 'pill sm');
-    return confirmBtn(tr('Make admin','Zum Admin machen'), tr('Confirm admin access','Admin-Rechte bestätigen'), () => st.setAdmin(u.user_id, true), 'pill sm solid');
-  };
-  return h('div', null,
-    h('div', {class:'stats'},
-      stat(st.loaded ? String(rows.length) : '—', tr('Accounts','Konten'), 'sm'),
-      stat(st.loaded ? String(admins) : '—', 'Admins', 'sm')),
-    h('div', {class:'spread', style:{marginTop:'28px', alignItems:'center'}},
-      h('p', {class:'note', style:{maxWidth:'760px'}}, tr('All registered AXIOM accounts are listed here. Admins can edit official evaluations, weights, tiers, patches, settings and other admin data. Normal users cannot.','Hier siehst du alle registrierten AXIOM-Konten. Admins dürfen offizielle Bewertungen, Gewichte, Tiers, Patches, Einstellungen und andere Admin-Daten bearbeiten. Normale Nutzer dürfen das nicht.')),
-      h('button', {class:'pill sm', type:'button', disabled:st.busy, onclick:()=>st.load(true)}, st.busy ? tr('Loading …','Lädt …') : tr('Refresh','Aktualisieren'))),
-    st.error ? h('p', {class:'err', role:'alert', style:{marginTop:'20px'}}, st.error) : null,
-    !st.loaded ? h('div', {class:'empty', style:{marginTop:'26px'}}, h('p', {class:'note'}, st.busy ? tr('Loading accounts …','Konten werden geladen …') : tr('Accounts are not loaded yet.','Konten sind noch nicht geladen.'))) :
-    rows.length ? h('div', {class:'table-wrap', style:{marginTop:'26px'}}, h('table', {class:'data'},
-      h('thead', null, h('tr', null,
-        h('th',{class:'l'},tr('Account','Konto')), h('th',{class:'l'},'E-Mail'), h('th',{class:'l'},tr('Role','Rolle')), h('th',{class:'l'},tr('Created','Erstellt')), h('th',{class:'l'},tr('Last sign-in','Letzte Anmeldung')), COMMUNITY ? h('th',null,tr('Ratings','Wertungen')) : null, h('th',null,tr('Access','Rechte')))),
-      h('tbody', null, rows.map(u => h('tr', null,
-        h('td',{class:'l'}, h('b',{style:{fontWeight:400}}, u.display_name || (u.user_id === Auth.id ? tr('You','Du') : tr('User','Nutzer'))), u.user_id === Auth.id ? h('span',{class:'dim',style:{marginLeft:'8px'}},'('+tr('you','du')+')') : null),
-        h('td',{class:'l'},u.email || '—'), h('td',{class:'l'},role(u)), h('td',{class:'l muted'},when(u.created_at)), h('td',{class:'l muted'},when(u.last_sign_in_at)), COMMUNITY ? h('td',null,Store.ratings[u.user_id] ? Object.keys(Store.ratings[u.user_id]).length : 0) : null, h('td',null,action(u))))))) :
-      h('p',{class:'note',style:{marginTop:'24px'}},tr('No accounts found.','Keine Konten gefunden.')),
-    h('p',{class:'note',style:{marginTop:'20px'}},tr('For safety you cannot remove your own admin role from this page. Another admin can change your role.','Zur Sicherheit kannst du dir auf dieser Seite die eigene Admin-Rolle nicht entziehen. Ein anderer Admin kann deine Rolle ändern.'))
-  );
-};
-
-/* ======================== AUTOMATIC PATCH CARRY-FORWARD ====================
-   A new game patch becomes the current AXIOM patch automatically. Until a hero is
-   re-published for that patch, the last published AXR stays visible and is clearly
-   marked as coming from the older patch. Draft work never replaces the old public
-   value until the new evaluation is published. */
-const AxiomPatchCarry = {
-  rev: -1, memo: {},
-  reset(){ if (this.rev !== Store.rev){ this.rev = Store.rev; this.memo = {}; } },
-  exactRows(patch, role){
-    const set = Store.evals[patch + ':' + role] || {};
-    const rows = Object.keys(set).filter(id => validHeroRole(id, role) && Engine.isPublic(set[id], role)).map(id => ({id, ev:set[id], score:Engine.score(set[id].c, role), sourcePatch:null}))
-      .sort((a,b) => b.score - a.score || HERO[a.id].name.localeCompare(HERO[b.id].name));
-    rows.forEach((r,i) => { r.rank=i+1; r.tier=Engine.tier(r.score); });
-    rows.byId = Object.fromEntries(rows.map(r => [r.id,r]));
-    return rows;
-  },
-  sourcePatch(patch, role){
-    const all = Store.patches(), start = all.indexOf(patch);
-    if (start < 0) return null;
-    for (let i=start+1;i<all.length;i++) if (this.exactRows(all[i],role).length) return all[i];
-    return null;
-  },
-  ranking(patch, role){
-    this.reset(); const key=patch+':'+role; if (this.memo[key]) return this.memo[key];
-    const exact=this.exactRows(patch,role), src=this.sourcePatch(patch,role);
-    if (!src) return this.memo[key]=exact;
-    const prev=this.exactRows(src,role), cur=exact.byId || {}, old=prev.byId || {}, ids=new Set([...Object.keys(old),...Object.keys(cur)]), rows=[];
-    ids.forEach(id => {
-      const r=cur[id] ? Object.assign({},cur[id],{sourcePatch:null}) : old[id] ? Object.assign({},old[id],{sourcePatch:src}) : null;
-      if (r) rows.push(r);
-    });
-    rows.sort((a,b)=>b.score-a.score || HERO[a.id].name.localeCompare(HERO[b.id].name));
-    rows.forEach((r,i)=>{r.rank=i+1;r.tier=Engine.tier(r.score);});
-    rows.byId=Object.fromEntries(rows.map(r=>[r.id,r]));
-    return this.memo[key]=rows;
-  },
-  info(patch){
-    const s=new Set(); ROLES.forEach(r=>this.ranking(patch,r).forEach(x=>{if(x.sourcePatch)s.add(x.sourcePatch);}));
-    return s.size ? {patch, sources:[...s]} : null;
-  }
-};
-Engine.ranking = function(patch, role){ return AxiomPatchCarry.ranking(patch, role); };
-Engine.movement = function(id, role, patch){
-  const a=this.entry(id,role,patch); if (!a || a.sourcePatch) return null;
-  const all=Store.patches(), start=all.indexOf(patch);
-  for(let i=start+1;i<all.length;i++){ const b=this.entry(id,role,all[i]); if(b && !b.sourcePatch) return b.rank-a.rank; }
-  return null;
-};
-
-function axiomCarryBanner(){
-  const info=AxiomPatchCarry.info(Store.patch()); if(!info)return null;
-  const de=I18n.lang==='de', from=info.sources.join(', '), to=info.patch;
-  return h('div',{class:'banner',style:{marginBottom:'28px'}},
-    h('span',{class:'micro ink'},de?'ÜBERNOMMENE AXR-WERTE':'INHERITED AXR VALUES'),
-    h('span',{class:'note',style:{maxWidth:'none'}},de ? ('Patch '+to+': Werte aus Patch '+from+'. Sie bleiben sichtbar, bis für '+to+' neue Bewertungen veröffentlicht werden.') : ('Patch '+to+': values from patch '+from+'. They stay visible until new '+to+' evaluations are published.')));
-}
-function wrapCarryView(name){
-  const base=Views[name]; if(typeof base!=='function')return;
-  Views[name]=function(){ const page=base.apply(this,arguments), b=axiomCarryBanner(); if(!b)return page; const w=page&&page.querySelector?page.querySelector('.wrap'):null; if(w)w.insertBefore(b,w.firstChild); return page; };
-}
-['home','rankings','meta','heroes','hero','compare'].forEach(wrapCarryView);
-
-`;
-    src=src.slice(0,at)+patch+src.slice(at);
+    const at=app.indexOf(marker);
+    if(at<0)throw new Error('AXIOM override marker not found');
+    const src=app.slice(0,at)+overrides+'\n'+app.slice(at);
     document.open();
     document.write(src);
     document.close();
