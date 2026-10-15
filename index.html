@@ -12,8 +12,8 @@
 (async()=>{
   try{
     const [app, overrides] = await Promise.all([
-      fetch('/app.html?v=20261015-no-carry-banner-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
-      fetch('/axiom-overrides.js?v=20261015-no-carry-banner-1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
+      fetch('/app.html?v=20261015-no-carry-banner-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
+      fetch('/axiom-overrides.js?v=20261015-no-carry-banner-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
     ]);
     const marker='/* DATA / API: the live backend';
     const at=app.indexOf(marker);
