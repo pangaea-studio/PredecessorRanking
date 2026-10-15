@@ -66,9 +66,8 @@ AdminViews.users = () => {
 
 /* ======================== AUTOMATIC PATCH CARRY-FORWARD ====================
    A new game patch becomes the current AXIOM patch automatically. Until a hero is
-   re-published for that patch, the last published AXR stays visible and is clearly
-   marked as coming from the older patch. Draft work never replaces the old public
-   value until the new evaluation is published. */
+   re-published for that patch, the last published AXR stays visible. Draft work never
+   replaces the old public value until the new evaluation is published. */
 const AxiomPatchCarry = {
   rev: -1, memo: {},
   reset(){ if (this.rev !== Store.rev){ this.rev = Store.rev; this.memo = {}; } },
@@ -112,19 +111,6 @@ Engine.movement = function(id, role, patch){
   for(let i=start+1;i<all.length;i++){ const b=this.entry(id,role,all[i]); if(b && !b.sourcePatch) return b.rank-a.rank; }
   return null;
 };
-
-function axiomCarryBanner(){
-  const info=AxiomPatchCarry.info(Store.patch()); if(!info)return null;
-  const de=I18n.lang==='de', from=info.sources.join(', '), to=info.patch;
-  return h('div',{class:'banner',style:{marginBottom:'28px'}},
-    h('span',{class:'micro ink'},de?'ÜBERNOMMENE AXR-WERTE':'INHERITED AXR VALUES'),
-    h('span',{class:'note',style:{maxWidth:'none'}},de ? ('Patch '+to+': Werte aus Patch '+from+'. Sie bleiben sichtbar, bis für '+to+' neue Bewertungen veröffentlicht werden.') : ('Patch '+to+': values from patch '+from+'. They stay visible until new '+to+' evaluations are published.')));
-}
-function wrapCarryView(name){
-  const base=Views[name]; if(typeof base!=='function')return;
-  Views[name]=function(){ const page=base.apply(this,arguments), b=axiomCarryBanner(); if(!b)return page; const w=page&&page.querySelector?page.querySelector('.wrap'):null; if(w)w.insertBefore(b,w.firstChild); return page; };
-}
-['home','rankings','meta','heroes','hero','compare'].forEach(wrapCarryView);
 
 /* ============================= AUDIT LOG UX ================================
    The raw audit record remains untouched. This layer translates technical actions
