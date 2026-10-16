@@ -11,19 +11,22 @@
 <script>
 (async()=>{
   try{
-    const [app, overrides] = await Promise.all([
-      fetch('/app.html?v=20261015-no-carry-banner-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
-      fetch('/axiom-overrides.js?v=20261015-no-carry-banner-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();})
+    const [app, overrides, previewCss] = await Promise.all([
+      fetch('/app.html?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
+      fetch('/axiom-overrides.js?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();}),
+      fetch('/preview-ui.css?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('preview '+r.status);return r.text();})
     ]);
     const marker='/* DATA / API: the live backend';
     const at=app.indexOf(marker);
     if(at<0)throw new Error('AXIOM override marker not found');
-    const src=app.slice(0,at)+overrides+'\n'+app.slice(at);
+    let src=app.slice(0,at)+overrides+'\n'+app.slice(at);
+    const style='<style id="axiom-design-preview-v2">'+previewCss+'</style>';
+    src=src.includes('</body>')?src.replace('</body>',style+'</body>'):src+style;
     document.open();
     document.write(src);
     document.close();
   }catch(e){
-    document.body.innerHTML='<div class="boot"><span>AXIOM could not load</span></div>';
+    document.body.innerHTML='<div class="boot"><span>AXIOM preview could not load</span></div>';
     console.error(e);
   }
 })();
