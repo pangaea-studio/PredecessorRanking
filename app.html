@@ -2853,6 +2853,17 @@ const LORE = SNAPSHOT.lore || {};
 /* German texts for the pred.gg descriptions; added to the dictionary without overriding UI words. */
 Object.entries(SNAPSHOT.loreDe || {}).forEach(([k, t]) => { if (!(k in I18n.D)) I18n.D[k] = t; });
 const KEY_LABEL = {BASIC: 'LMB', ALTERNATE: 'RMB', PRIMARY: 'Q', SECONDARY: 'E', ULTIMATE: 'R', PASSIVE: 'Passive'};
+/* AXIOM home (design preview v2): German texts of the new start page */
+Object.assign(I18n.D, {'View hero': 'Held ansehen', 'Own evaluation': 'Eigene Bewertung', 'Role & performance': 'Rolle & Leistung', 'All heroes': 'Alle Helden', 'Overview': 'Übersicht', 'Stats': 'Stats', 'Trends': 'Trends', 'Meta analysis': 'Meta-Analyse', 'Category': 'Kategorie', 'Hero sections': 'Bereiche des Helden'});
+{ const base = I18n.extraRules; I18n.extraRules = T => [
+  [/^of (\d+) rated (Offlane|Jungle|Mid|Carry|Support) heroes$/, 'von $1 bewerteten $2-Helden'], [/^Patch (.+?) vs (.+)$/, 'Patch $1 ggü. $2'],
+  [/^Win, pick and ban rate: all roles · pred\.gg snapshot (.+)$/, 'Winrate, Pickrate, Banrate: alle Rollen · pred.gg-Schnappschuss $1'],
+  [/^Ranking — (.+)$/, 'Ranking — $1'], [/^More (Offlane|Jungle|Mid|Carry|Support) heroes$/, 'Weitere $1-Helden'],
+  [/^Who rises, who falls and which tiers lead (.+) right now$/, 'Wer steigt, wer fällt und welche Tiers aktuell auf $1 vorne liegen'],
+  [/^(.+) \(gold\) against the average of all rated (.+) heroes \(violet\)$/, '$1 (gold) gegen den Durchschnitt aller bewerteten $2-Helden (violett)'],
+  [/^Our own rating per category against the average of all rated (.+) heroes in patch (.+)\.$/, 'Unsere eigene Bewertung je Kategorie gegen den Durchschnitt aller bewerteten $1-Helden in Patch $2.']
+].concat(base ? base(T) : []); }
+
 Views.home = () => {
   const s = App.s.home, patch = Store.patch();
   /* Featured: the admin's choice, otherwise the highest role scores of the patch across all
@@ -2872,79 +2883,124 @@ Views.home = () => {
   const setRole = r => { s.rsel = {id: x.id, role: r}; App.render(); };
   const go = () => { Store.ui.heroRole[x.id] = role; };
 
-  /* ---- showcase: the artwork itself is the backdrop, text sits on its dark side ---- */
+  /* ---- AXIOM stage: name and story on the left, the AXR ring in the middle, one glass band
+     with tier, rank and the observed rates. AXR, rank and tier come only from our own evaluation;
+     win / pick / ban rate are observed numbers (all roles, per patch) and never touch them. ---- */
   const long = !!(L && L.d && L.d.length > 150);
-  const copy = h('div', {class: 'show-copy'},
-      h('p', {class: 'crumbs micro'}, link('heroes', null, 'Heroes'), h('span', {'aria-hidden': 'true'}, '›'), h('span', null, ROLE_LABEL[role]), h('span', {'aria-hidden': 'true'}, '›'), h('span', {class: 'ink'}, x.name)),
-      h('h1', {class: 'show-name'}, x.name),
-      h('p', {class: 'show-title'}, L && L.t ? L.t : ' '),
-      h('div', {class: 'lore-box'}, L && L.d ? h('p', {class: 'show-lore' + (s.more ? ' open' : '')}, L.d) : null,
-        long ? h('button', {type: 'button', class: 'textbtn more', 'aria-expanded': String(!!s.more), onclick: () => { s.more = !s.more; App.render(); }}, s.more ? 'Show less' : 'Read more') : null),
-      h('div', {class: 'show-tags', role: 'group', 'aria-label': 'Role'}, x.roles.map(r => h('button', {type: 'button', class: 'tag' + (r === role ? ' on' : ''), 'aria-pressed': String(r === role), onclick: () => setRole(r)}, roleIcon(r), ROLE_LABEL[r]))),
-      h('div', {class: 'row', style: {gap: '12px', marginTop: '6px'}}, link('hero.' + x.id, {class: 'pill solid', onclick: go}, 'Hero page', h('span', {'aria-hidden': 'true'}, '→')),
-        link('rankings', {class: 'pill', onclick: () => { Store.ui.role = Store.ui.rkRole = role; }}, ROLE_LABEL[role] + ' ranking')));
-  /* The selector: every hero of the pool in one fixed strip; it never moves, only the highlight does. */
-  /* Endless wheel: K heroes either side of the selected one, wrapping around the list, so there is
-     no first or last. A step re-renders around the new hero and slides in from the old position. */
-  const N = pool.length, K = Math.min(8, Math.floor((N - 1) / 2)), wrap = i => ((i % N) + N) % N;
-  let shift = s.from == null ? 0 : wrap(idx - s.from); if (shift > N / 2) shift -= N; s.from = null;
-  const track = h('div', {class: 'hs-track'}, Array.from({length: 2 * K + 1}, (_, j) => { const d = j - K, i = wrap(idx + d), o = pool[i], ad = Math.min(Math.abs(d), 4);
-    return h('button', {type: 'button', class: 'thumb d' + ad + (d === 0 ? ' on' : ''), tabindex: Math.abs(d) > 4 ? '-1' : null, 'aria-label': HERO[o.id].name, 'aria-current': d === 0 ? 'true' : null, onclick: () => { if (d) { s.from = idx; s.id = o.id; s.ab = null; s.more = false; s.rsel = null; App.render(); } }},
-      h('span', {class: 'th-img'}, h('img', {src: HERO[o.id].art, alt: ''})), h('span', {class: 'th-n'}, HERO[o.id].name)); }));
-  track.style.setProperty('--k', K); track.style.setProperty('--s', -shift);
-  if (shift) requestAnimationFrame(() => requestAnimationFrame(() => track.style.setProperty('--s', 0)));
-  const strip = h('nav', {class: 'hstrip', 'aria-label': 'Heroes in focus'},
-      h('button', {class: 'iconbtn', type: 'button', 'aria-label': 'Previous hero', onclick: () => step(-1)}, '‹'),
-      h('div', {class: 'hs-view'}, track),
-      h('button', {class: 'iconbtn', type: 'button', 'aria-label': 'Next hero', onclick: () => step(1)}, '›'));
+  const chev = () => S('svg', {class: 'ax-chev', viewBox: '0 0 16 16', 'aria-hidden': 'true'}, S('path', {d: 'M6 3.5 10.5 8 6 12.5'}));
+  const barsIcon = () => S('svg', {class: 'ax-ico', viewBox: '0 0 16 16', 'aria-hidden': 'true'}, S('path', {d: 'M3 13.5V9.5M6.5 13.5V6.5M10 13.5V8.5M13.5 13.5V3'}));
+  const toRanking = () => { Store.ui.role = Store.ui.rkRole = role; };
+  const copy = h('div', {class: 'ax-copy'},
+    h('p', {class: 'crumbs ax-crumbs'}, link('heroes', null, 'Heroes'), h('span', {'aria-hidden': 'true'}, '›'), link('rankings', {onclick: toRanking}, ROLE_LABEL[role]), h('span', {'aria-hidden': 'true'}, '›'), h('span', {class: 'ink'}, x.name)),
+    L && L.t ? h('p', {class: 'ax-kicker'}, L.t) : null,
+    h('h1', {class: 'ax-name' + (x.name.length > 9 ? ' xl' : x.name.length > 7 ? ' l' : '')}, x.name),
+    h('div', {class: 'lore-box ax-lorebox'}, L && L.d ? h('p', {class: 'show-lore ax-lore' + (s.more ? ' open' : '')}, L.d) : null,
+      long ? h('button', {type: 'button', class: 'textbtn more', 'aria-expanded': String(!!s.more), onclick: () => { s.more = !s.more; App.render(); }}, s.more ? 'Show less' : 'Read more') : null),
+    h('div', {class: 'ax-cta'}, link('hero.' + x.id, {class: 'ax-btn gold', onclick: go}, 'View hero', h('span', {'aria-hidden': 'true'}, '→')),
+      link('rankings', {class: 'ax-btn ghost', onclick: toRanking}, barsIcon(), ROLE_LABEL[role] + ' ranking')));
 
-  /* ---- key figures: role score and rank are ours, the rates are pred.gg (all roles, per patch) ---- */
-  const hist = PredAdapter.getHeroHistory(x.id), now = hist[0] || null, prev = hist[1] || null, last = hist.slice(0, 10).reverse();
-  const delta = k => now && prev ? now[k] - prev[k] : null;
   const dEl = d => d == null ? null : h('span', {class: 'delta ' + (d > 0.05 ? 'up' : d < -0.05 ? 'down' : '')}, (d > 0.05 ? '▲ +' : d < -0.05 ? '▼ −' : '± ') + Math.abs(d).toFixed(1));
   const card = (cls, label, ...kids) => h('div', {class: 'dcard ' + cls}, h('p', {class: 'micro dl'}, label), ...kids);
-  /* Rate cards: the latest patch by default; hover or tap a bar/point to read that patch.
-     A tap pins it, a second tap (or a tap elsewhere in the chart) releases it. */
+  /* AXR ring: the gold arc is the score itself (0–100), not decoration */
+  const myCh = e ? (OfficialMeta.role(patch, role).changes.find(c => c.id === x.id) || null) : null;
+  const R0 = 118, C0 = 2 * Math.PI * R0, frac = e ? clamp(e.score, 0, 100) / 100 : 0, ang = -Math.PI / 2 + frac * 2 * Math.PI;
+  const ringSvg = S('svg', {class: 'ax-ringsvg', viewBox: '0 0 300 300', 'aria-hidden': 'true'},
+    S('circle', {class: 'o1', cx: 150, cy: 150, r: 146}), S('circle', {class: 'o2', cx: 150, cy: 150, r: 104}),
+    S('circle', {class: 'trk', cx: 150, cy: 150, r: R0}),
+    e ? S('circle', {class: 'arc', cx: 150, cy: 150, r: R0, 'stroke-dasharray': (C0 * frac).toFixed(1) + ' ' + C0.toFixed(1), transform: 'rotate(-90 150 150)'}) : null,
+    e ? S('circle', {class: 'tip', cx: (150 + Math.cos(ang) * R0).toFixed(1), cy: (150 + Math.sin(ang) * R0).toFixed(1), r: 4.5}) : null,
+    S('circle', {class: 'sat', cx: 150 + 146 * Math.cos(-2.3), cy: 150 + 146 * Math.sin(-2.3), r: 3}), S('circle', {class: 'sat s2', cx: 150 + 146 * Math.cos(.35), cy: 150 + 146 * Math.sin(.35), r: 2.2}));
+  const ring = h('div', {class: 'ax-ring' + (e ? '' : ' ax-empty')}, ringSvg,
+    h('div', {class: 'ax-ringc'}, h('p', {class: 'ax-lbl'}, 'AXR · ' + ROLE_LABEL[role]),
+      h('p', {class: 'ax-score num'}, e ? fmt1(e.score) : '—'),
+      myCh ? h('p', {class: 'ax-ringd'}, dEl(myCh.d)) : null,
+      h('p', {class: 'ax-ringn'}, e ? 'Own evaluation' : 'Not evaluated yet'), e ? h('p', {class: 'ax-ringn dim'}, 'Patch ' + patch) : null));
+
+  /* key-figure band */
+  const hist = PredAdapter.getHeroHistory(x.id), now = hist[0] || null, prev = hist[1] || null, last = hist.slice(0, 10).reverse();
+  const stat = (cls, ...kids) => h('div', {class: 'ax-stat ' + cls}, ...kids);
   const before = j => j > 0 ? last[j - 1] : hist[last.length] || null;
+  /* Rates: the latest patch by default; hover or tap a bar/point to read that patch.
+     A tap pins it, a second tap (or a tap elsewhere in the chart) releases it. */
   const rate = (k, label, kind) => {
-    const vEl = h('span', {class: 'kpi-v num'}), dBox = h('span', {class: 'dbox'}), note = h('p', {class: 'note'});
+    const vEl = h('span', {class: 'ax-big num'}), dBox = h('span', {class: 'ax-dl'}), vs = h('span', {class: 'ax-vs'});
     let pinned = null;
     const show = j => { const o = last[j], p = before(j);
       vEl.textContent = o ? fmtPct(o[k]) : '—'; dBox.replaceChildren(...[o && p ? dEl(o[k] - p[k]) : null].filter(Boolean));
-      note.textContent = o ? 'All roles · patch ' + o.patch + (p ? ' vs ' + p.patch : '') : 'No data'; };
+      vs.textContent = o ? 'Patch ' + o.patch + (p ? ' vs ' + p.patch : '') : 'No data'; };
     const chart = (kind === 'line' ? Charts.spark : Charts.bars)(last.map(o => o[k]), {labels: last.map(o => o.patch), fmt: fmtPct,
       onPick: (j, click) => { if (click){ pinned = pinned === j ? null : j; } const t = j == null ? pinned : j; show(t == null ? last.length - 1 : t); return t == null ? last.length - 1 : t; }});
     show(last.length - 1);
-    return card('kpi', label, h('div', {class: 'kpi-row'}, vEl, dBox), chart, note);
+    return stat('rate', vEl, h('span', {class: 'ax-lbl'}, label), h('div', {class: 'ax-chart'}, chart), h('p', {class: 'ax-foot'}, dBox, vs));
   };
   const total = Engine.ranking(patch, role).length, mv = e ? Engine.movement(x.id, role, patch) : null;
-  const kpis = h('div', {class: 'dash kpis'},
-    card('kpi score', 'AXR · ' + ROLE_LABEL[role],
-      e ? h('div', {class: 'score-row'}, h('span', {class: 'score-v num'}, fmt1(e.score)), h('span', {class: 'tierb'}, h('b', null, e.tier), h('small', null, 'Tier'))) : h('div', {class: 'score-row'}, h('span', {class: 'score-v dim'}, '—')),
-      h('p', {class: 'note'}, e ? 'Own evaluation · patch ' + patch : 'Not evaluated yet')),
-    card('kpi', 'Ranking', h('div', {class: 'kpi-row'}, h('span', {class: 'kpi-v num'}, e ? '#' + e.rank : '—'), movementEl(mv)),
-      h('p', {class: 'note'}, e ? 'of ' + total + ' rated · ' + ROLE_LABEL[role] : 'Not evaluated yet')),
+  const band = h('div', {class: 'ax-band'},
+    stat('tier', h('span', {class: 'ax-big ax-tier'}, e ? e.tier : '—'), h('span', {class: 'ax-lbl'}, 'Tier'), h('i', {class: 'ax-uline', 'aria-hidden': 'true'})),
+    stat('rank', h('span', {class: 'ax-big num'}, e ? '#' + e.rank : '—', movementEl(mv)), h('span', {class: 'ax-lbl'}, 'Ranking'),
+      h('p', {class: 'ax-sub'}, e ? 'of ' + total + ' rated ' + ROLE_LABEL[role] + ' heroes' : 'Not evaluated yet')),
     rate('winRate', 'Win rate', 'line'), rate('pickRate', 'Pick rate', 'bars'), rate('banRate', 'Ban rate', 'bars'));
+  const bandSrc = h('p', {class: 'ax-src'}, 'Win, pick and ban rate: all roles · pred.gg snapshot ' + fmtDate(PredAdapter.snapshotAt));
+  const stage = h('section', {class: 'ax-stage'}, copy, ring, h('div', {class: 'ax-bandwrap'}, band, bandSrc));
+
+  /* section tabs: only places that exist; no tab for data AXIOM does not have */
+  const tabs = h('nav', {class: 'ax-tabs', 'aria-label': 'Hero sections'},
+    h('span', {class: 'on', 'aria-current': 'page'}, 'Overview'),
+    link('hero.' + x.id, {onclick: go}, 'Stats'),
+    link('meta', null, 'Trends'),
+    link('compare', null, 'Compare'));
 
   /* ---- role performance, category profile, ranking neighbours ---- */
+  const head = (label, tip, extra) => h('header', {class: 'ax-head'}, h('span', {class: 'ax-gem', 'aria-hidden': 'true'}), h('h2', {class: 'ax-title'}, label),
+    tip ? h('span', {class: 'ax-help', tabindex: '0', role: 'note', title: tip, 'aria-label': tip}, '?') : null, extra ? h('span', {class: 'ax-hx'}, extra) : null);
+  const box = (cls, ...kids) => h('section', {class: 'ax-card ' + cls}, ...kids);
   const roleRows = x.roles.map(r => { const re = official(x.id, r), rl = live(x.id, r);
     return h('li', {class: 'go' + (r === role ? ' on' : ''), tabindex: '0', role: 'button', 'aria-pressed': String(r === role), onclick: () => setRole(r), onkeydown: ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); setRole(r); } }}, h('span', {class: 'rp-n'}, roleIcon(r), ROLE_LABEL[r]), h('span', {class: 'rp-v num'}, re ? fmt1(re.score) : '—'),
-      h('span', {class: 'rp-bar', 'aria-hidden': 'true'}, h('i', {style: {width: (re ? clamp(re.score, 0, 100) : 0) + '%'}})), h('span', {class: 'rp-wr num'}, rl ? fmtPct(rl.winRate) : '—')); });
+      h('span', {class: 'rp-bar', 'aria-hidden': 'true'}, h('i', {style: {width: (re ? clamp(re.score, 0, 100) : 0) + '%'}})), h('span', {class: 'rp-wr num'}, rl ? fmtPct(rl.winRate) : '—'), chev()); });
   const rl = live(x.id, role);
-  const perf = card('perf', 'Role performance', h('ul', {class: 'rp-list'}, h('li', {class: 'rp-head micro'}, h('span', null, 'Role'), h('span', null, 'AXR'), h('span'), h('span', null, 'Win rate')), roleRows),
-    rl ? h('div', {class: 'rp-stats'}, h('p', {class: 'micro dl'}, ROLE_LABEL[role] + ' · pred.gg'), h('dl', null,
-      [['Win rate', fmtPct(rl.winRate)], ['Pick rate', fmtPct(rl.pickRate)], ['Ban rate', fmtPct(rl.banRate)], ['Matches', fmtInt(rl.matches)]].map(([k, val]) => h('div', null, h('dt', {class: 'micro'}, k), h('dd', {class: 'num'}, val))))) : null,
-    h('p', {class: 'note'}, 'Only the roles pred.gg lists for ' + x.name + '. Win rate in the role, patch ' + SNAPSHOT.rolePatch + '.'));
+  const perf = box('perf', head('Role & performance', 'Only the roles pred.gg lists for ' + x.name + '. Win rate in the role, patch ' + SNAPSHOT.rolePatch + '.'),
+    h('ul', {class: 'rp-list'}, h('li', {class: 'rp-head micro'}, h('span', null, 'Role'), h('span', null, 'AXR'), h('span'), h('span', null, 'Win rate'), h('span')), roleRows),
+    rl ? h('dl', {class: 'ax-rstats'}, [['Pick rate', fmtPct(rl.pickRate)], ['Ban rate', fmtPct(rl.banRate)], ['Matches', fmtInt(rl.matches)]].map(([k, val]) => h('div', null, h('dt', {class: 'micro'}, k), h('dd', {class: 'num'}, val)))) : null);
   const others = Engine.ranking(patch, role), avg = {};
   if (e) ROLE_CATS[role].forEach(k => { const v = others.map(o => o.ev.c[k]).filter(n => n != null); avg[k] = v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; });
-  const radar = card('radarc', 'Category profile', e ? [Charts.radar([{c: e.ev.c}, {c: avg, cls: 'b'}], ROLE_CATS[role], x.name + ' (solid white) against the average of all rated ' + ROLE_LABEL[role] + ' heroes (dashed gold)', {big: true}),
-      h('div', {class: 'leg'}, h('span', null, h('i'), x.name), h('span', null, h('i', {class: 'b'}), 'Average ' + ROLE_LABEL[role]))]
-    : h('p', {class: 'empty-note'}, 'The category profile appears once ' + x.name + ' is evaluated as ' + ROLE_LABEL[role] + '.'));
-  const near = e ? others.slice(clamp(e.rank - 3, 0, Math.max(0, others.length - 5)), clamp(e.rank - 3, 0, Math.max(0, others.length - 5)) + 5) : [];
-  const ctx = card('ctx', 'Ranking context · ' + ROLE_LABEL[role], near.length ? h('table', {class: 'mini'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, '#'), h('th', {class: 'l'}, 'Hero'), h('th', null, 'AXR'), h('th', null, 'Win rate'), h('th', null, 'Tier'))),
+  const cats = ROLE_CATS[role]; if (!cats.includes(s.cat)) s.cat = cats[0];
+  const fv = n => n == null ? '—' : String(Math.round(n));
+  let radarSvg = null;
+  if (e){ radarSvg = Charts.radar([{c: e.ev.c}, {c: avg, cls: 'b'}], cats, x.name + ' (gold) against the average of all rated ' + ROLE_LABEL[role] + ' heroes (violet)', {big: true});
+    radarSvg.setAttribute('viewBox', '-80 34 680 474'); const tx = radarSvg.querySelectorAll('text'), ci = cats.indexOf(s.cat); if (tx[2 * ci]) tx[2 * ci].classList.add('hl'); if (tx[2 * ci + 1]) tx[2 * ci + 1].classList.add('hl'); }
+  const catSel = e ? h('label', {class: 'ax-sel'},
+    h('select', {'aria-label': 'Category', onchange: ev => { s.cat = ev.target.value; App.render(); }}, cats.map(k => h('option', {value: k, selected: k === s.cat ? 'selected' : null}, CAT[k].short + '   ' + fv(e.ev.c[k]) + ' / ' + fv(avg[k]))))) : null;
+  const radar = box('radarc', head('Category profile', 'Our own rating per category against the average of all rated ' + ROLE_LABEL[role] + ' heroes in patch ' + patch + '.', catSel),
+    e ? [radarSvg, h('div', {class: 'leg'}, h('span', null, h('i'), x.name), h('span', null, h('i', {class: 'b'}), 'Average ' + ROLE_LABEL[role]))]
+      : h('p', {class: 'empty-note'}, 'The category profile appears once ' + x.name + ' is evaluated as ' + ROLE_LABEL[role] + '.'));
+  const near = e ? others.slice(clamp(e.rank - 3, 0, Math.max(0, others.length - 5)), clamp(e.rank - 3, 0, Math.max(0, others.length - 5)) + 5) : others.slice(0, 5);
+  const ctx = box('ctx', head('Ranking — ' + ROLE_LABEL[role], null, link('rankings', {class: 'ax-pill', onclick: toRanking}, 'All heroes', h('span', {'aria-hidden': 'true'}, '→'))),
+    near.length ? h('table', {class: 'mini'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, '#'), h('th', {class: 'l'}, 'Hero'), h('th', null, 'AXR'), h('th', null, 'Win rate'), h('th', null, 'Tier'))),
       h('tbody', null, near.map(o => { const ol = live(o.id, role); return h('tr', {class: 'go' + (o.id === x.id ? ' on' : ''), onclick: () => { Store.ui.heroRole[o.id] = role; App.go('hero.' + o.id); }},
-        h('td', {class: 'l num'}, o.rank), h('td', {class: 'l'}, h('span', {class: 'heroCell'}, h('img', {src: HERO[o.id].icon, alt: ''}), h('b', null, HERO[o.id].name))), h('td', {class: 'num'}, fmt1(o.score)), h('td', {class: 'num muted'}, ol ? fmtPct(ol.winRate) : '—'), h('td', null, o.tier)); })))
+        h('td', {class: 'l num'}, o.rank), h('td', {class: 'l'}, h('span', {class: 'heroCell'}, h('img', {src: HERO[o.id].icon, alt: ''}), h('b', null, HERO[o.id].name))), h('td', {class: 'num'}, fmt1(o.score)), h('td', {class: 'num muted'}, ol ? fmtPct(ol.winRate) : '—'), h('td', {class: 'ax-t'}, o.tier)); })))
     : h('p', {class: 'empty-note'}, 'No ranking yet for ' + ROLE_LABEL[role] + ' in patch ' + patch + '.'));
+
+  /* ---- the wheel: every hero of the shown role, AXR order first, then by matches in that role.
+     Endless: K heroes either side of the selected one, wrapping around, no first or last.
+     A step re-renders around the new hero and slides in from the old position; the role stays. ---- */
+  const rkIds = others.map(o => o.id), mcount = id => { const l = live(id, role); return l ? l.matches : 0; };
+  const wheel = rkIds.concat(heroesOfRole(role).map(o => o.id).filter(id => !rkIds.includes(id)).sort((a, b) => mcount(b) - mcount(a) || HERO[a].name.localeCompare(HERO[b].name)));
+  if (!wheel.includes(x.id)) wheel.unshift(x.id);
+  const N = wheel.length, wi = wheel.indexOf(x.id), K = Math.min(7, Math.floor((N - 1) / 2)), wrap = i => ((i % N) + N) % N;
+  const pickW = i => { const id = wheel[wrap(i)]; if (id === x.id) return; s.from = wi; s.id = id; s.rsel = {id, role}; s.ab = null; s.more = false; App.render(); };
+  let shift = s.from == null ? 0 : wrap(wi - s.from); if (shift > N / 2) shift -= N; s.from = null;
+  const track = h('div', {class: 'hs-track'}, Array.from({length: 2 * K + 1}, (_, j) => { const d = j - K, id = wheel[wrap(wi + d)], ad = Math.min(Math.abs(d), 4);
+    return h('button', {type: 'button', class: 'thumb d' + ad + (d === 0 ? ' on' : ''), tabindex: Math.abs(d) > 4 ? '-1' : null, 'aria-label': HERO[id].name, 'aria-current': d === 0 ? 'true' : null, onclick: () => pickW(wi + d)},
+      h('span', {class: 'th-img'}, h('img', {src: HERO[id].icon || HERO[id].art, alt: ''})), h('span', {class: 'th-n'}, HERO[id].name)); }));
+  track.style.setProperty('--k', K); track.style.setProperty('--s', -shift);
+  if (shift) requestAnimationFrame(() => requestAnimationFrame(() => track.style.setProperty('--s', 0)));
+  const strip = h('nav', {class: 'hstrip ax-wheel', 'aria-label': 'More ' + ROLE_LABEL[role] + ' heroes'},
+    h('p', {class: 'ax-wlabel'}, 'More ' + ROLE_LABEL[role] + ' heroes'),
+    h('button', {class: 'iconbtn ax-round', type: 'button', 'aria-label': 'Previous hero', onclick: () => pickW(wi - 1)}, '‹'),
+    h('div', {class: 'hs-view'}, track),
+    h('button', {class: 'iconbtn ax-round', type: 'button', 'aria-label': 'Next hero', onclick: () => pickW(wi + 1)}, '›'));
+  const metaCta = link('meta', {class: 'ax-metacta'}, h('span', {class: 'ax-mico', 'aria-hidden': 'true'}, barsIcon()),
+    h('span', {class: 'ax-mtxt'}, h('b', null, 'Meta analysis'), h('span', null, 'Who rises, who falls and which tiers lead ' + ROLE_LABEL[role] + ' right now')),
+    h('span', {class: 'ax-round ax-go', 'aria-hidden': 'true'}, '›'));
 
   /* ---- concise meta snapshot: own-evaluation movers and tiers, observed most played ----
      (win rate by patch, abilities and patch history live on the hero page) */
@@ -2972,8 +3028,9 @@ Views.home = () => {
       link('rankings', {class: 'link', onclick: () => { Store.ui.role = Store.ui.rkRole = r; }}, 'Full ranking →'));
   });
 
-  return h('div', {class: 'page home2'}, h('div', {class: 'wrap wide'}, demoBanner(), h('section', {class: 'show'}, copy, kpis), strip,
-    h('div', {class: 'dash row3'}, perf, radar, ctx),
+  return h('div', {class: 'page home2 ax-home'}, h('div', {class: 'wrap wide'}, demoBanner(), stage, tabs,
+    h('div', {class: 'ax-row3'}, perf, radar, ctx),
+    h('div', {class: 'ax-bottom'}, strip, metaCta),
     h('section', {class: 'sec home-meta'}, h('div', {class: 'sec-head'}, h('div', null, micro('Patch ' + patch, 'rule'), h('h2', {class: 'h2', style: {marginTop: '14px'}}, 'Meta snapshot')), link('meta', {class: 'pill sm'}, 'Full meta →')),
       h('div', {class: 'dash row3'}, movers, tiersC, played)),
     h('section', {class: 'sec home-roles'}, h('div', {class: 'sec-head'}, h('div', null, micro('Patch ' + patch, 'rule'), h('h2', {class: 'h2', style: {marginTop: '14px'}}, 'The best in every role')), link('rankings', {class: 'pill sm'}, 'All rankings →')),
