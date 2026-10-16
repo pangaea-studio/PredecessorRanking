@@ -1,0 +1,320 @@
+/* AXIOM DESIGN PREVIEW V2
+   Presentation-only overrides. No ranking, auth, patch or data logic is changed. */
+
+/* Keep the existing atmospheric background/canvas. Only reshape the home interface. */
+.home2 .wrap.wide{
+  width:min(100% - 40px,1580px);
+  max-width:1580px;
+  margin-inline:auto;
+  padding-inline:0;
+}
+
+.home2{
+  --preview-line:rgba(255,255,255,.115);
+  --preview-line-strong:rgba(255,255,255,.22);
+  --preview-surface:rgba(8,8,12,.32);
+  --preview-surface-2:rgba(16,14,22,.50);
+}
+
+/* Header remains glassy but quieter against the existing background. */
+.home2 ~ *{}
+.nav{
+  background:linear-gradient(180deg,rgba(7,7,10,.74),rgba(7,7,10,.22),transparent);
+}
+.nav.solid{
+  background:rgba(8,8,11,.76);
+  border-bottom-color:rgba(255,255,255,.09);
+}
+
+/* Main hero identity + one integrated analytics deck. */
+.home2 .show{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(330px,.78fr) minmax(0,1.52fr);
+  gap:clamp(44px,5vw,88px);
+  align-items:center;
+  min-height:0;
+  padding:18px 0 34px;
+  overflow:visible;
+}
+.home2 .show::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,rgba(216,195,122,.62),var(--preview-line) 18%,var(--preview-line),transparent 100%);
+}
+.home2 .show-copy{
+  max-width:590px;
+  gap:15px;
+  padding:22px 0 24px;
+}
+.home2 .show-name{
+  font-size:clamp(54px,5.3vw,86px);
+  line-height:.88;
+  letter-spacing:-.045em;
+  text-wrap:balance;
+}
+.home2 .show-lore{
+  max-width:52ch;
+  color:rgba(255,255,255,.72);
+}
+.home2 .crumbs{opacity:.78}
+.home2 .show-copy .pills{margin-top:4px}
+
+/* Five KPIs become one coherent data surface instead of five cards. */
+.home2 .show .kpis{
+  display:grid;
+  grid-template-columns:minmax(180px,1.35fr) minmax(125px,.78fr) repeat(3,minmax(130px,.82fr));
+  gap:0;
+  margin:0;
+  padding:22px 0;
+  border-top:1px solid var(--preview-line-strong);
+  border-bottom:1px solid var(--preview-line-strong);
+  background:linear-gradient(90deg,rgba(16,13,22,.46),rgba(11,10,17,.20) 60%,rgba(8,8,11,.06));
+  -webkit-backdrop-filter:blur(7px);
+  backdrop-filter:blur(7px);
+}
+.home2 .show .kpis .dcard{
+  min-width:0;
+  padding:12px clamp(16px,1.45vw,26px);
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  gap:11px;
+}
+.home2 .show .kpis .dcard + .dcard{
+  border-left:1px solid var(--preview-line);
+}
+.home2 .show .kpis .score{
+  grid-column:auto;
+  position:relative;
+}
+.home2 .show .kpis .score::before{
+  content:"";
+  position:absolute;
+  left:0;top:8px;bottom:8px;
+  width:2px;
+  background:var(--gold);
+  opacity:.9;
+}
+.home2 .show .kpis .score-v{
+  font-size:clamp(58px,4.4vw,78px);
+  color:#fff;
+}
+.home2 .show .kpis .score-row{
+  justify-content:flex-start;
+  gap:18px;
+}
+.home2 .show .kpis .tierb{
+  width:auto;
+  height:auto;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:none;
+  align-items:flex-start;
+  color:var(--gold);
+}
+.home2 .show .kpis .tierb b{
+  font-size:30px;
+  line-height:1;
+}
+.home2 .show .kpis .tierb small{
+  font-size:9px;
+  letter-spacing:.18em;
+}
+.home2 .show .kpis .kpi-v{
+  font-size:clamp(28px,2.2vw,38px);
+}
+.home2 .show .kpis .note{
+  font-size:11px;
+  line-height:1.35;
+  color:rgba(255,255,255,.38);
+}
+.home2 .show .kpis svg.chart{
+  opacity:.72;
+}
+
+/* Hero chooser becomes a slim editorial filmstrip. */
+.home2 .hstrip{
+  margin:24px 0 32px;
+  padding:18px 0 15px;
+  border-bottom:1px solid var(--preview-line);
+  gap:12px;
+}
+.home2 .hstrip .thumb{
+  width:54px;
+  height:66px;
+  border:0;
+  border-radius:7px;
+  opacity:.42;
+  background:transparent;
+  transform:none;
+}
+.home2 .hstrip .thumb .th-img{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;
+  overflow:hidden;
+}
+.home2 .hstrip .thumb.on{
+  opacity:1;
+  transform:translateY(-3px);
+}
+.home2 .hstrip .thumb.on .th-img{
+  border:1px solid var(--gold);
+  box-shadow:0 10px 28px rgba(0,0,0,.34);
+  transform:none;
+}
+.home2 .hstrip .thumb.on .th-n{color:var(--gold)}
+
+/* Primary analysis: three columns, one continuous surface, separators instead of cards. */
+.home2 > .wrap.wide > .dash.row3,
+.home2 .home-meta .dash.row3{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:0;
+  border-top:1px solid var(--preview-line-strong);
+  border-bottom:1px solid var(--preview-line);
+  background:linear-gradient(180deg,rgba(13,11,18,.28),rgba(8,8,11,.10));
+}
+.home2 > .wrap.wide > .dash.row3 > .dcard,
+.home2 .home-meta .dash.row3 > .dcard{
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  padding:26px clamp(20px,2vw,34px) 28px;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+.home2 > .wrap.wide > .dash.row3 > .dcard + .dcard,
+.home2 .home-meta .dash.row3 > .dcard + .dcard{
+  border-left:1px solid var(--preview-line);
+}
+
+/* Lower sections use rhythm and rules rather than boxed modules. */
+.home2 .sec{
+  margin-top:clamp(54px,6.5vw,92px);
+}
+.home2 .sec-head{
+  margin-bottom:20px;
+}
+.home2 .sec-head .h2{
+  font-size:clamp(28px,3vw,45px);
+}
+.home2 .home-roles .rgrid{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:0;
+  border-top:1px solid var(--preview-line-strong);
+  border-bottom:1px solid var(--preview-line);
+}
+.home2 .home-roles .rcol,
+.home2 .home-roles .rcol:first-child{
+  padding:24px clamp(15px,1.6vw,25px) 22px;
+  border:0;
+  background:none;
+}
+.home2 .home-roles .rcol + .rcol{
+  border-left:1px solid var(--preview-line);
+}
+.home2 .home-roles .rimg{
+  border-radius:7px;
+}
+
+/* Controls stay recognizable, but lighter than the old card-heavy interface. */
+.home2 .pill{
+  background:rgba(8,8,12,.18);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+}
+.home2 .pill.solid{
+  background:#fff;
+}
+
+@media (max-width:1280px){
+  .home2 .show{
+    grid-template-columns:minmax(300px,.72fr) minmax(0,1.28fr);
+    gap:38px;
+  }
+  .home2 .show .kpis{
+    grid-template-columns:minmax(170px,1.2fr) minmax(110px,.72fr) repeat(3,minmax(105px,.78fr));
+  }
+  .home2 .show .kpis .dcard{padding-inline:14px}
+}
+
+@media (max-width:1050px){
+  .home2 .show{
+    grid-template-columns:1fr;
+    gap:24px;
+    align-items:start;
+  }
+  .home2 .show-copy{max-width:760px;padding-bottom:4px}
+  .home2 .show .kpis{
+    grid-template-columns:1.35fr .8fr repeat(3,1fr);
+  }
+  .home2 > .wrap.wide > .dash.row3,
+  .home2 .home-meta .dash.row3{
+    grid-template-columns:1fr 1fr;
+  }
+  .home2 > .wrap.wide > .dash.row3 > :last-child,
+  .home2 .home-meta .dash.row3 > :last-child{
+    grid-column:1 / -1;
+    border-left:0;
+    border-top:1px solid var(--preview-line);
+  }
+  .home2 .home-roles .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home2 .home-roles .rcol:nth-child(odd){border-left:0}
+  .home2 .home-roles .rcol:nth-child(n+3){border-top:1px solid var(--preview-line)}
+}
+
+@media (max-width:760px){
+  .home2 .wrap.wide{
+    width:min(100% - 28px,1580px);
+  }
+  .home2 .show{
+    padding-top:4px;
+  }
+  .home2 .show-name{
+    font-size:clamp(44px,13vw,62px);
+    white-space:normal;
+  }
+  .home2 .show .kpis{
+    grid-template-columns:1fr 1fr;
+    padding:0;
+    background:rgba(10,9,14,.20);
+  }
+  .home2 .show .kpis .dcard{
+    padding:18px 16px;
+    border-left:0;
+    border-top:1px solid var(--preview-line);
+  }
+  .home2 .show .kpis .score{
+    grid-column:1 / -1;
+    border-top:0;
+  }
+  .home2 .show .kpis .dcard:nth-child(even){border-left:1px solid var(--preview-line)}
+  .home2 .show .kpis .score-v{font-size:60px}
+  .home2 .hstrip{margin-top:18px;overflow-x:auto;scrollbar-width:none}
+  .home2 .hstrip::-webkit-scrollbar{display:none}
+  .home2 > .wrap.wide > .dash.row3,
+  .home2 .home-meta .dash.row3{
+    grid-template-columns:1fr;
+  }
+  .home2 > .wrap.wide > .dash.row3 > .dcard,
+  .home2 .home-meta .dash.row3 > .dcard{
+    padding:22px 16px;
+    border-left:0!important;
+    border-top:1px solid var(--preview-line);
+  }
+  .home2 > .wrap.wide > .dash.row3 > .dcard:first-child,
+  .home2 .home-meta .dash.row3 > .dcard:first-child{border-top:0}
+  .home2 > .wrap.wide > .dash.row3 > :last-child,
+  .home2 .home-meta .dash.row3 > :last-child{grid-column:auto}
+  .home2 .home-roles .rgrid{grid-template-columns:1fr}
+  .home2 .home-roles .rcol + .rcol{border-left:0;border-top:1px solid var(--preview-line)}
+}
