@@ -108,7 +108,7 @@
 .ax-foot{margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .ax-foot .delta{font-size:14px;color:var(--ax-ink)} .ax-foot .delta.up{color:var(--ax-gold-2)} .ax-foot .delta.down{color:#c9b8ff}
 .ax-vs{font-size:11px;color:var(--ax-dim)}
-.ax-src{margin:10px 0 0 calc(var(--rr) + 26px);font-size:11px;letter-spacing:.02em;color:var(--ax-dim)}
+.ax-src{position:absolute;left:0;right:0;top:100%;margin:10px 0 0 calc(var(--rr) + 26px);font-size:11px;letter-spacing:.02em;color:var(--ax-dim)}
 
 /* --------------------------------- TABS ---------------------------------- */
 .ax-tabs{display:flex;gap:clamp(22px,3.4vw,52px);margin-top:18px;border-bottom:1px solid var(--ax-line);overflow-x:auto;scrollbar-width:none}
@@ -229,7 +229,7 @@
   /* stable heights on phones too, so the wheel stays where the thumb is */
   .ax-band{min-height:556px;align-content:start} .ax-sub{min-height:2.9em}
   .ax-row3 > .perf{min-height:352px} .ax-row3 > .radarc{min-height:344px} .ax-row3 > .ctx{min-height:330px}
-  .ax-src{margin-left:4px}
+  .ax-src{position:static;margin-left:4px}
   .ax-stat{padding:18px 6px;border-left:0!important;border-top:1px solid rgba(255,255,255,.08)}
   .ax-stat:nth-child(-n+2){border-top:0}
   .ax-stat:nth-child(even){padding-left:18px;border-left:1px solid rgba(255,255,255,.08)!important}
