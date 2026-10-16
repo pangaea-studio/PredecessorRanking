@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>AXIOM — Predecessor Competitive Intelligence</title>
+<title>AXIOM — Design Preview</title>
 <style>html,body{margin:0;min-height:100%;background:#0b0b0c;color:#fff;font-family:Inter,system-ui,sans-serif}.boot{min-height:100vh;display:grid;place-items:center}.boot span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#9a9a9a}</style>
 </head>
 <body>
-<div class="boot"><span>AXIOM</span></div>
+<div class="boot"><span>AXIOM Preview</span></div>
 <script>
 (async()=>{
   try{
     const [app, overrides, previewCss] = await Promise.all([
-      fetch('/app.html?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
-      fetch('/axiom-overrides.js?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();}),
-      fetch('/preview-ui.css?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('preview '+r.status);return r.text();})
+      fetch('./app.html?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('app '+r.status);return r.text();}),
+      fetch('./axiom-overrides.js?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('overrides '+r.status);return r.text();}),
+      fetch('./preview-ui.css?v=20261016-preview-v2',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('preview '+r.status);return r.text();})
     ]);
     const marker='/* DATA / API: the live backend';
     const at=app.indexOf(marker);
