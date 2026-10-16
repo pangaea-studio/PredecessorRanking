@@ -2856,6 +2856,7 @@ const KEY_LABEL = {BASIC: 'LMB', ALTERNATE: 'RMB', PRIMARY: 'Q', SECONDARY: 'E',
 /* AXIOM home (design preview v2): German texts of the new start page */
 Object.assign(I18n.D, {'View hero': 'Held ansehen', 'Own evaluation': 'Eigene Bewertung', 'Role & performance': 'Rolle & Leistung', 'All heroes': 'Alle Helden', 'Overview': 'Übersicht', 'Stats': 'Stats', 'Trends': 'Trends', 'Meta analysis': 'Meta-Analyse', 'Category': 'Kategorie', 'Hero sections': 'Bereiche des Helden'});
 { const base = I18n.extraRules; I18n.extraRules = T => [
+  [/^Category ratings of (.+) \(gold\) and (.+) \(violet\)$/, 'Kategorie-Wertungen von $1 (gold) und $2 (violett)'],
   [/^of (\d+) rated (Offlane|Jungle|Mid|Carry|Support) heroes$/, 'von $1 bewerteten $2-Helden'], [/^Patch (.+?) vs (.+)$/, 'Patch $1 ggü. $2'],
   [/^Win, pick and ban rate: all roles · pred\.gg snapshot (.+)$/, 'Winrate, Pickrate, Banrate: alle Rollen · pred.gg-Schnappschuss $1'],
   [/^Ranking — (.+)$/, 'Ranking — $1'], [/^More (Offlane|Jungle|Mid|Carry|Support) heroes$/, 'Weitere $1-Helden'],
@@ -3361,7 +3362,7 @@ Views.compare = () => {
           COMMUNITY ? [h('tr', {class: 'grp'}, h('td', {colSpan: 3}, h('span', {class: 'srctag'}, 'Community'))), line('User rating', a.ag.avg, b.ag.avg, v => v.toFixed(1) + ' / 5')] : null))),
           (a.lv || b.lv) ? provenance((a.lv || b.lv).src, null, a.lv && b.lv && (a.lv.src.roles !== b.lv.src.roles || a.lv.src.kind !== b.lv.src.kind) ? 'The two sides use different sources or role scopes' : null) : null),
       h('div', {class: 'split sec'},
-        h('div', null, a.e && b.e && shared.length > 2 ? [h('div', {class: 'cmp-legend'}, [[a, 'a'], [b, 'b']].map(([o, k]) => h('div', {class: 'cl ' + k}, h('span', {class: 'sw', 'aria-hidden': 'true'}), h('img', {src: o.x.icon, alt: ''}), h('b', null, o.x.name), h('span', {class: 'micro'}, ROLE_LABEL[o.s.role])))), Charts.radar([{c: a.e.ev.c}, {c: b.e.ev.c, cls: 'b'}], shared, 'Category ratings of ' + a.x.name + ' (solid white) and ' + b.x.name + ' (dashed gold)', {big: true})] : h('div', {class: 'empty'}, h('p', {class: 'h3'}, 'Both heroes need an evaluation for the radar overlay.'))),
+        h('div', null, a.e && b.e && shared.length > 2 ? [h('div', {class: 'cmp-legend'}, [[a, 'a'], [b, 'b']].map(([o, k]) => h('div', {class: 'cl ' + k}, h('span', {class: 'sw', 'aria-hidden': 'true'}), h('img', {src: o.x.icon, alt: ''}), h('b', null, o.x.name), h('span', {class: 'micro'}, ROLE_LABEL[o.s.role])))), Charts.radar([{c: a.e.ev.c}, {c: b.e.ev.c, cls: 'b'}], shared, 'Category ratings of ' + a.x.name + ' (gold) and ' + b.x.name + ' (violet)', {big: true})] : h('div', {class: 'empty'}, h('p', {class: 'h3'}, 'Both heroes need an evaluation for the radar overlay.'))),
         h('div', null, micro('Category comparison', 'rule'), h('div', {class: 'table-wrap', style: {marginTop: '18px'}}, h('table', {class: 'data cmp'}, h('thead', null, h('tr', null, h('th', {class: 'l'}, a.x.name), h('th', null, 'Category'), h('th', null, b.x.name))),
           h('tbody', null, cats.map(k => line(CAT[k].short, cv(a, k), cv(b, k), v => String(Math.round(v)))))))))));
 };
